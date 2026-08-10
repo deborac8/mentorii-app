@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentorii — Sistema Inteligente de Estudos & Carreira</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <main class="app">
+        <!-- TOPBAR UNIVERSAL -->
+        <header class="topbar">
+            <div>
+                <div class="eyebrow" id="user-profile-type">SISTEMA ADAPTATIVO DE ESTUDOS</div>
+                <h1 id="user-pdi-title">Mentorii Cockpit</h1>
+                <p class="topbar-description" id="user-pdi-desc">Painel de execução diária com IA, acompanhamento de hábitos e gamificação.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-action" onclick="openOnboardingModal()">✨ Gerar/Refazer Plano (IA)</button>
+                <button class="btn-backup" onclick="exportBackupJSON()">💾 Backup</button>
+                <button class="btn-backup" onclick="document.getElementById('import-json-file').click()">📂 Restaurar</button>
+                <input type="file" id="import-json-file" style="display:none" onchange="importBackupJSON(event)">
+            </div>
+        </header>
+
+        <!-- BARRA MACRO DE PROGRESSO & STREAK -->
+        <div class="global-progress-box">
+            <div class="global-progress-info" id="global-progress-text">Evolução Global: 0%</div>
+            <div class="global-progress-bar-bg">
+                <div class="global-progress-bar-fill" id="global-progress-bar"></div>
+            </div>
+            <div class="streak-badge" id="streak-counter-badge">🔥 0 Dias Ativos</div>
+        </div>
+
+        <!-- NAVEGAÇÃO DE ABAS UNIVERSAIS -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-foco', this)">🎯 Foco & Pomodoro</button>
+            <button class="tab-btn" onclick="switchTab('tab-prioridades', this)">★ Prioridades & Alvos</button>
+            <button class="tab-btn" onclick="switchTab('tab-diario', this)">📋 Diário de Progresso</button>
+            <button class="tab-btn" onclick="switchTab('tab-notebook', this)">📓 Cadernos & Exercícios</button>
+            <button class="tab-btn" onclick="switchTab('tab-mentorii-lab', this)">🐾 Mentorii RPG & Mascote</button>
+            <button class="tab-btn" onclick="switchTab('tab-habitos', this)">🌸 Hábitos</button>
+            <button class="tab-btn" onclick="switchTab('tab-graficos', this)">📊 Gráficos</button>
+            <button class="tab-btn" onclick="switchTab('tab-cursos', this)">📚 Trilha / Disciplinas</button>
+            <button class="tab-btn tab-backlog" onclick="switchTab('tab-incubadora', this)">📦 Incubadora / Backlog</button>
+            <button class="tab-btn" onclick="switchTab('tab-agenda', this)">📆 Agenda & Prazos</button>
+        </nav>
+
+        <!-- ABA 1: FOCO & POMODORO -->
+        <section id="tab-foco" class="tab-content active">
+            <div class="oracle-card">
+                <div class="oracle-header">
+                    <span class="oracle-title">🔮 Oráculo do Dia (Diagnóstico Inteligente)</span>
+                </div>
+                <div class="oracle-recommendation" id="oracle-recommendation-text">
+                    Aguardando análise do seu perfil de estudo...
+                </div>
+            </div>
+
+            <div class="daily-focus-card" id="daily-focus-card-box">
+                <div>
+                    <div class="daily-focus-header">
+                        <span class="daily-focus-tag">⚡ Meta do Momento</span>
+                        <span class="category-tag" id="daily-focus-category">Geral</span>
+                    </div>
+                    <div class="daily-focus-task" id="daily-focus-task-text">Carregando a próxima meta...</div>
+                    <div class="daily-focus-actions">
+                        <button class="btn-complete-task" onclick="completeCurrentDailyTask()">✓ Concluir e Ganhar FP</button>
+                        <button class="btn-skip-task" onclick="skipCurrentDailyTask()">⏭️ Pular</button>
+                    </div>
+                </div>
+
+                <div class="pomodoro-box">
+                    <div class="pomodoro-title">⏱️ Relógio Pomodoro</div>
+                    <div class="pomodoro-display" id="pomo-timer-display">25:00</div>
+                    <div class="pomodoro-cycles" id="pomo-cycle-text">Ciclos Concluídos Hoje: 0</div>
+                    <div class="pomodoro-btns">
+                        <button class="btn-pomo" onclick="startPomodoro()">▶ Iniciar</button>
+                        <button class="btn-pomo" onclick="pausePomodoro()">⏸ Pausar</button>
+                        <button class="btn-pomo" onclick="resetPomodoro(25)">🔄 25m</button>
+                        <button class="btn-pomo" onclick="resetPomodoro(5)">☕ 5m Pausa</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sprint-box">
+                <div class="sprint-header">
+                    <span class="section-subtitle">🎯 Sprint da Semana</span>
+                    <button class="btn-add" onclick="addSprintGoal()">+ Adicionar Meta Semanal</button>
+                </div>
+                <ul class="sprint-list" id="sprint-goals-list"></ul>
+            </div>
+        </section>
+
+        <!-- ABA 2: PRIORIDADES -->
+        <section id="tab-prioridades" class="tab-content">
+            <div class="priority-hero">
+                <div class="card priority-main">
+                    <div class="priority-label" id="priority-goal-label">ALVO DE ESTUDO</div>
+                    <h3 id="priority-goal-title">Defina seu objetivo principal</h3>
+                    <p id="priority-goal-desc">O Mentorii calcula o peso das disciplinas/projetos com base na sua meta final.</p>
+                </div>
+                <div class="card priority-score">
+                    <div class="priority-score-inner">
+                        <span class="big" style="font-size:36px; font-family:var(--mono); color:var(--purple); font-weight:800;" id="readiness-score-hero">0%</span>
+                        <span style="font-size:11px; font-family:var(--mono); color:var(--text-dim);" id="readiness-score-label">Nível de Prontidão</span>
+                    </div>
+                </div>
+            </div>
+            <div id="priority-matrix-table-container"></div>
+        </section>
+
+        <!-- ABA 3: DIÁRIO DE PROGRESSO -->
+        <section id="tab-diario" class="tab-content">
+            <div class="diary-summary card">
+                <div class="ring-wrap" style="text-align:center;">
+                    <svg width="140" height="140" viewBox="0 0 160 160">
+                        <circle cx="80" cy="80" r="68" fill="none" stroke="var(--bg-subtle)" stroke-width="12"/>
+                        <circle id="ring-fg" cx="80" cy="80" r="68" fill="none" stroke="var(--purple)" stroke-width="12" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="427" transform="rotate(-90 80 80)" style="transition:stroke-dashoffset .4s ease"/>
+                        <text id="ring-text" x="80" y="86" text-anchor="middle" fill="var(--text)" font-family="JetBrains Mono" font-size="22" font-weight="700">0%</text>
+                    </svg>
+                    <div class="ring-num" id="ring-sub" style="font-family:var(--mono); font-size:12px; color:var(--text-dim); margin-top:6px;"><b>0</b> / 0 itens concluídos</div>
+                </div>
+                <div class="diary-groups" id="diary-groups"></div>
+            </div>
+
+            <div class="diary-filters" id="diary-filters" style="margin-bottom:16px;"></div>
+            <div id="diary-list"></div>
+        </section>
+
+        <!-- ABA 4: NOTEBOOK & CADERNOS TEMÁTICOS -->
+        <section id="tab-notebook" class="tab-content">
+            <div class="card card-purple-border">
+                <div class="flex-between">
+                    <div>
+                        <span class="eyebrow">📓 Cadernos & Resoluções</span>
+                        <h3>Organização de Exercícios, Simulados e Capítulos</h3>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-action" onclick="createNewNotebook()">+ Criar Novo Caderno</button>
+                        <button class="btn-add" onclick="openExerciseModal()">+ Registrar Exercício</button>
+                    </div>
+                </div>
+            </div>
+            <div id="custom-notebook-cards-container"></div>
+        </section>
+
+        <!-- ABA 5: MENTORII RPG -->
+        <section id="tab-mentorii-lab" class="tab-content">
+            <div class="mentorii-world-container">
+                <span class="eyebrow">🐾 Mentorii Companheiro Vivo</span>
+                <div id="pet-avatar" style="font-size: 56px; margin: 12px 0;">🥚</div>
+                <h2 id="pet-name-title">Ovo Misterioso</h2>
+                <div class="pet-speech-bubble" id="pet-speech-text">Carregando pensamentos...</div>
+                <div class="pet-status" id="pet-status-desc">Carregando status...</div>
+                <div class="valley-visual-map" id="valley-map-display">🏕️ Fogueira do Valley</div>
+            </div>
+        </section>
+
+        <!-- ABA 6: HÁBITOS -->
+        <section id="tab-habitos" class="tab-content">
+            <div class="habit-tracker-container">
+                <div class="flex-between">
+                    <h2 class="section-title-mono">🌸 Hábitos e Rotina Diária</h2>
+                    <span class="habit-consistency" id="habit-consistency-text">Consistência: 0%</span>
+                </div>
+                <table class="habit-table">
+                    <thead><tr><th class="text-left">HÁBITO</th><th>SEG</th><th>TER</th><th>QUA</th><th>QUI</th><th>SEX</th><th>SÁB</th><th>DOM</th></tr></thead>
+                    <tbody id="habit-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ABA 7: GRÁFICOS -->
+        <section id="tab-graficos" class="tab-content">
+            <div class="charts-grid">
+                <div class="chart-card"><div class="chart-title">📊 Foco Semanal</div><canvas id="weeklyBarChart" height="220"></canvas></div>
+                <div class="chart-card"><div class="chart-title">🍩 Distribuição de Tempo</div><canvas id="distributionDoughnutChart" height="220"></canvas></div>
+            </div>
+        </section>
+
+        <!-- ABA 8: CURSOS / TRILHA -->
+        <section id="tab-cursos" class="tab-content">
+            <div class="flex-between mb-16">
+                <span class="section-subtitle">Disciplinas / Cursos em Execução</span>
+                <button class="btn-action" onclick="addNewCourse('active')">+ Adicionar Item</button>
+            </div>
+            <div id="active-courses-module-container" class="course-grid"></div>
+        </section>
+
+        <!-- ABA 9: INCUBADORA -->
+        <section id="tab-incubadora" class="tab-content">
+            <div class="flex-between mb-16">
+                <span class="section-subtitle color-gray">Backlog & Foco Futuro (Protegido pelo Guardião)</span>
+                <button class="btn-action" onclick="addNewCourse('incubated')">+ Adicionar ao Backlog</button>
+            </div>
+            <div id="incubated-courses-module-container" class="course-grid"></div>
+        </section>
+
+        <!-- ABA 10: AGENDA -->
+        <section id="tab-agenda" class="tab-content">
+            <div class="calendar-box">
+                <div class="calendar-header-nav">
+                    <button class="btn-cal-nav" onclick="changeCalendarMonth(-1)">&lt;</button>
+                    <span id="calendar-month-year-title">Mês</span>
+                    <button class="btn-cal-nav" onclick="changeCalendarMonth(1)">&gt;</button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid-days"></div>
+            </div>
+            <div class="journal-container">
+                <div id="journal-check-sections"></div>
+            </div>
+        </section>
+
+        <footer><span>MENTORII — SYSTEM OPERATING SYSTEM</span><span>Multiusuário & Versátil</span></footer>
+    </main>
+
+    <!-- MODAL DE ONBOARDING / CONFIGURAÇÃO POR IA PARA USUÁRIOS REAIS -->
+    <div id="onboarding-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="eyebrow">✨ DIAGNÓSTICO INICIAL MENTORII</div>
+            <h3>Configure seu Plano de Estudo ou Carreira</h3>
+            <p style="font-size:12px; color:var(--text-dim); margin-bottom:14px;">
+                Responda com seu objetivo (ENEM, Vestibular, Concurso, Faculdade ou Estágio Tech). O Oráculo de IA organizará seu plano:
+            </p>
+
+            <div class="form-group">
+                <label>1. Qual é seu Objetivo Principal para os próximos meses?</label>
+                <input type="text" id="onb-goal" class="input-text" placeholder="Ex: Aprovado em Medicina ENEM / Estágio em Visão Computacional / Concurso Banco do Brasil">
+            </div>
+
+            <div class="form-group" style="margin-top:10px;">
+                <label>2. Qual é seu perfil de estudante?</label>
+                <select id="onb-profile-type" class="select-priority" style="width:100%;">
+                    <option value="vestibular">🎓 Vestibular / ENEM / Concursos</option>
+                    <option value="tech">💻 Tecnologia / Engenharia / Estágio</option>
+                    <option value="faculdade">📚 Graduação / Faculdade Geral</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-top:10px;">
+                <label>3. Liste as principais matérias/cursos que você precisa estudar:</label>
+                <textarea id="onb-subjects" class="input-text" style="width:100%; height:70px;" placeholder="Ex: Matemática, Redação, Física, Biologia OU Python, C#, Visão Computacional"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button class="btn-skip-task" onclick="closeOnboardingModal()">Cancelar</button>
+                <button class="btn-action" onclick="submitOnboardingForm()">🚀 Gerar Meu Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="oracle.js"></script>
+    <script src="mentorii/mentorii-core.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
