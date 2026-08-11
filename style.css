@@ -3,24 +3,24 @@
 /* Define as paletas de cores, fontes, sombras e bordas do app. */
 /* ============================================================ */
 
-/* TEMA 1: SOFT PASTEL / CLEAN GIRL (Tema Padrão) */
+/* TEMA 1: SOFT PASTEL / CLEAN GIRL (Identidade Reestilizada Suave & Aconchegante) */
 :root, [data-theme="pastel"] {
-    --bg-main: #f9f8fc;
+    --bg-main: #fbf8fe;
     --bg-card: #ffffff;
-    --bg-subtle: #f2edf9;
-    --border: #e6ddf2;
-    --border-light: #f0eaf7;
+    --bg-subtle: #f5eefc;
+    --border: #ebdcf8;
+    --border-light: #f4eafe;
     
-    --text: #2d2638;
-    --text-dim: #716782;
+    --text: #2c2238;
+    --text-dim: #79688e;
     
-    --purple: #8b5cf6;
-    --purple-light: #ede9fe;
+    --purple: #9061f9;
+    --purple-light: #f0e7ff;
     --salvia: #10b981;
     --salvia-light: #d1fae5;
     --amber: #f59e0b;
     --amber-light: #fef3c7;
-    --pink: #ec4899;
+    --pink: #f472b6;
     --pink-light: #fce7f3;
     --red: #ef4444;
     --red-light: #fee2e2;
@@ -28,12 +28,12 @@
     --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --mono: 'JetBrains Mono', monospace;
 
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
     
-    --shadow-sm: 0 1px 3px rgba(45, 38, 56, 0.05);
-    --shadow-md: 0 4px 12px rgba(45, 38, 56, 0.08);
+    --shadow-sm: 0 2px 6px rgba(144, 97, 249, 0.06);
+    --shadow-md: 0 6px 18px rgba(144, 97, 249, 0.10);
 }
 
 /* TEMA 2: DARK MODE / CYBER HUD */

@@ -426,3 +426,56 @@ function importBackupJSON(event) {
     };
     reader.readAsText(file);
 }
+
+// ============================================================
+// FUNÇÕES DE IMPORTAÇÃO RÁPIDA DE PDI NO MODAL
+// ============================================================
+function togglePastePDIBox() {
+    const box = document.getElementById('paste-pdi-container');
+    if (box) {
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function importPDIFromFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        applyParsedPDI(e.target.result);
+    };
+    reader.readAsText(file);
+}
+
+function importPDIFromPastedText() {
+    const text = document.getElementById('paste-pdi-json-input').value;
+    if (!text || text.trim().length === 0) {
+        alert("⚠️ Por favor, cole o JSON do PDI na caixa antes de aplicar.");
+        return;
+    }
+    applyParsedPDI(text);
+}
+
+function applyParsedPDI(rawContent) {
+    if (!window.MentoriiOracle) {
+        alert("Erro no motor analítico do Oráculo.");
+        return;
+    }
+
+    const parsed = MentoriiOracle.parsePDIStructure(rawContent);
+    if (parsed) {
+        MentoriiCore.state.profile.targetGoal = parsed.profile.targetGoal;
+        MentoriiCore.state.profile.surgeryFocus = parsed.profile.surgeryFocus;
+        if (parsed.activeCourses && parsed.activeCourses.length > 0) {
+            MentoriiCore.state.activeCourses = parsed.activeCourses;
+        }
+        
+        MentoriiCore.save();
+        closeOnboardingModal();
+        renderDashboard();
+        alert("🎉 PDI importado e aplicado ao seu Cockpit com sucesso!");
+    } else {
+        alert("❌ Não foi possível interpretar a estrutura do PDI. Verifique se o formato do JSON está correto.");
+    }
+}
