@@ -298,20 +298,28 @@
         <!-- SEÇÃO 5.10: ABA 10 — AGENDA & CALENDÁRIO                     -->
         <!-- Calendário mensal navegável com compromissos e prazos.       -->
         <!-- ============================================================ -->
-        <section id="tab-agenda" class="tab-content">
-            <div class="calendar-box card mb-16">
-                <div class="calendar-header-nav" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <button class="btn-cal-nav btn-backup" onclick="changeCalendarMonth(-1)">&lt; Mês Anterior</button>
-                    <span id="calendar-month-year-title" style="font-family: var(--mono); font-weight: bold; font-size: 14px;">Mês</span>
-                    <button class="btn-cal-nav btn-backup" onclick="changeCalendarMonth(1)">Próximo Mês &gt;</button>
+        <!-- TAB: AGENDA & CALENDÁRIO MENSAL -->
+        <div id="tab-agenda" class="tab-content" style="display:none; flex-direction:column; gap:16px;">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h3>📅 Calendário Mensal & Compromissos</h3>
+                    <button type="button" class="btn-action" style="font-size:11px;" onclick="addNewAgendaEvent()">+ Agendar Compromisso</button>
                 </div>
-                <div class="calendar-grid" id="calendar-grid-days"></div>
+                
+                <!-- GRADE DO CALENDÁRIO MENSAL -->
+                <div id="calendar-monthly-grid" style="display:grid; grid-template-columns: repeat(7, 1fr); gap:6px; text-align:center; font-family:var(--mono); font-size:12px;">
+                    <!-- Renderizado dinamicamente via JS -->
+                </div>
             </div>
-            <div class="journal-container card">
-                <div id="journal-check-sections"></div>
-            </div>
-        </section>
 
+            <!-- LISTA DE COMPROMISSOS AGENDADOS -->
+            <div class="card">
+                <h3>📌 Próximos Compromissos</h3>
+                <div id="agenda-events-list" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                    <!-- Renderizado dinamicamente via JS -->
+                </div>
+            </div>
+        </div>
         <!-- ============================================================ -->
         <!-- SEÇÃO 5.11: ABA 11 — CONFIGURAÇÕES & TEMAS                   -->
         <!-- Seletor de Temas Visuais (Soft Pastel, Dark, Sálvia, Slate). -->
@@ -353,29 +361,31 @@
             </p>
 
         <!-- CAIXA DE IMPORTAÇÃO RÁPIDA DE PDI -->
-        <div style="background:var(--bg-subtle); border:1px dashed var(--purple); padding:12px; border-radius:var(--radius-sm); margin-bottom:16px;">
-            <span style="font-size:11px; font-family:var(--mono); font-weight:bold; color:var(--purple); display:block; margin-bottom:6px;">📂 IMPORTAR PDI PRONTO:</span>
-            
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button type="button" id="btn-trigger-file-input" class="btn-backup" style="font-size:11px; padding:6px 10px;">📄 Carregar Arquivo JSON</button>
-                <button type="button" id="btn-trigger-paste-box" class="btn-backup" style="font-size:11px; padding:6px 10px;">📋 Colar Texto/JSON</button>
-                <input type="file" id="pdi-file-input-element" style="display:none" accept=".json,.txt,.html">
-            </div>
-            
-            <div id="paste-pdi-container" style="display:none; margin-top:10px;">
-                <textarea id="paste-pdi-json-input" class="input-text" style="width:100%; height:70px; font-family:var(--mono); font-size:11px;" placeholder="Cole o código JSON ou texto do PDI aqui..."></textarea>
-                <button type="button" id="btn-apply-pasted-pdi" class="btn-action" style="font-size:11px; margin-top:6px; width:100%;">✓ Aplicar PDI Colado</button>
-            </div>
-
-            <!-- CAMPO VISUAL DO ARQUIVO INDEXADO -->
-            <div id="pdi-file-status-box" style="display:none; background:var(--bg-card); border:1px solid var(--purple); padding:8px 12px; border-radius:var(--radius-sm); margin-top:10px; align-items:center; justify-content:space-between;">
-                <div style="font-size:11.5px; font-family:var(--mono); color:var(--purple); font-weight:bold;">
-                    📌 Arquivo Indexado: <span id="pdi-filename-label" style="text-decoration:underline;">Nenhum</span>
+            <div style="background:var(--bg-subtle); border:1px dashed var(--purple); padding:12px; border-radius:var(--radius-sm); margin-bottom:16px;">
+                <span style="font-size:11px; font-family:var(--mono); font-weight:bold; color:var(--purple); display:block; margin-bottom:6px;">📂 IMPORTAR PDI PRONTO:</span>
+                
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+                    <button type="button" id="btn-trigger-file-input" class="btn-backup" style="font-size:11px; padding:6px 10px;">📄 Carregar Arquivo (JSON/TXT)</button>
+                    <button type="button" id="btn-trigger-paste-box" class="btn-backup" style="font-size:11px; padding:6px 10px;">📋 Colar Texto/JSON</button>
+                    <button type="button" class="btn-backup" style="font-size:11px; padding:6px 10px;" onclick="copyAIPromptToClipboard()">✨ Copiar Prompt para ChatGPT/Claude</button>
+                    <input type="file" id="pdi-file-input-element" style="display:none" accept=".json,.txt,.html">
                 </div>
-                <span style="font-size:10.5px; color:var(--text-dim);" id="pdi-indexed-time">--:--</span>
-            </div>
-        </div>
+                
+                <div id="paste-pdi-container" style="display:none; margin-top:10px;">
+                    <textarea id="paste-pdi-json-input" class="input-text" style="width:100%; height:70px; font-family:var(--mono); font-size:11px;" placeholder="Cole o código JSON, HTML ou texto do PDI aqui..."></textarea>
+                    <button type="button" id="btn-apply-pasted-pdi" class="btn-action" style="font-size:11px; margin-top:6px; width:100%;">✓ Aplicar PDI Colado</button>
+                </div>
 
+         <!-- CAMPO VISUAL DO ARQUIVO INDEXADO COM BOTAO DE REMOVER -->
+            <div id="pdi-file-status-box" style="display:none; background:var(--bg-card); border:1px solid var(--purple); padding:8px 12px; border-radius:var(--radius-sm); margin-top:10px; align-items:center; justify-content:space-between; gap:8px;">
+                <div style="font-size:11.5px; font-family:var(--mono); color:var(--purple); font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    📌 Indexado: <span id="pdi-filename-label" style="text-decoration:underline;">Nenhum</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                    <span style="font-size:10.5px; color:var(--text-dim);" id="pdi-indexed-time">--:--</span>
+                    <button type="button" class="btn-backup" style="font-size:10px; padding:3px 8px; color:var(--red); border-color:var(--red-light);" onclick="clearIndexedPDI()" title="Remover indexação atual para carregar outro PDI">❌ Desfazer / Limpar</button>
+                </div>
+            </div>
             <!-- FORMULÁRIO MANUAL -->
             <div class="form-group mb-10" style="margin-bottom:10px;">
                 <label style="font-size:12px; font-family:var(--mono); font-weight:bold;">1. Objetivo Principal (Ex: Vestibular / Concurso / Faculdade):</label>
@@ -433,3 +443,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+

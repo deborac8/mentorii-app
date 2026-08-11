@@ -73,40 +73,50 @@ window.switchTab = function(tabId, element) {
 };
 
 // ============================================================
-// 4. RENDERIZAÇÃO DO DASHBOARD
+// 4.RENDERIZAÇÃO DE DISCIPLINAS COM BOTÃO DE EXCLUSÃO
 // ============================================================
-window.renderDashboard = function() {
-    const state = MentoriiCore.state;
+window.renderActiveCourses = function() {
+    const container = document.getElementById('active-courses-module-container');
+    if (!container) return;
 
-    const pdiTitle = document.getElementById('user-pdi-title');
-    const pdiDesc = document.getElementById('user-pdi-desc');
-    const profileTypeLabel = document.getElementById('user-profile-type');
+    const courses = MentoriiCore.state.activeCourses;
+    container.innerHTML = "";
 
-    if (pdiTitle) pdiTitle.innerText = state.profile.targetGoal || "Mentorii Cockpit";
-    if (pdiDesc) pdiDesc.innerText = `Foco Cirúrgico: ${state.profile.surgeryFocus || 'Revisão e Prática Solo'}`;
-    if (profileTypeLabel) profileTypeLabel.innerText = `PERFIL: ${(state.profile.profileType || 'GERAL').toUpperCase()} | ${state.profile.name || 'Estudante'}`;
-
-    const oracleText = document.getElementById('oracle-recommendation-text');
-    if (oracleText && window.MentoriiOracle) {
-        oracleText.innerHTML = MentoriiOracle.generateFallbackRecommendation(state);
+    if (!courses || courses.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-dim); font-size:12px; font-family:var(--mono); grid-column: 1/-1; padding:16px; text-align:center; border:1px dashed var(--border);">Nenhuma disciplina ativa cadastrada. Use a importação ou o botão acima.</div>`;
+        return;
     }
 
-    const streakBadge = document.getElementById('streak-counter-badge');
-    if (streakBadge) streakBadge.innerText = `🔥 ${state.streakDays || 1} Dias Ativos`;
+    courses.forEach((course, index) => {
+        const card = document.createElement('div');
+        card.className = 'course-card card';
+        card.style.position = 'relative';
+        card.innerHTML = `
+            <button type="button" onclick="removeCourse('${course.id}')" title="Remover disciplina" style="position:absolute; top:10px; right:10px; background:transparent; border:none; color:var(--red); cursor:pointer; font-size:12px; font-family:var(--mono);">🗑️ Excluir</button>
+            <div class="course-card-header">
+                <div>
+                    <span class="category-tag">${course.label || 'Geral'}</span>
+                    <div class="course-card-title" style="margin-top:4px; padding-right:60px; font-weight:bold;">${course.name}</div>
+                </div>
+            </div>
+            <div style="font-size:11.5px; color:var(--text-dim); margin:10px 0 6px 0;">
+                Módulos concluídos: ${course.items ? course.items.filter(i => i.done).length : 0} / ${course.items ? course.items.length : 1}
+            </div>
+            <div style="display:flex; gap:6px;">
+                <button type="button" class="btn-action" style="font-size:11px; padding:6px 10px; width:100%;" onclick="completeCourseItem('${course.id}')">✓ Progredir (+15 FP)</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+};
 
-    const readinessScore = window.MentoriiOracle ? MentoriiOracle.calculateReadinessScore(state.activeCourses) : 0;
-    const globalProgressText = document.getElementById('global-progress-text');
-    const globalProgressBar = document.getElementById('global-progress-bar');
-    const readinessHero = document.getElementById('readiness-score-hero');
-
-    if (globalProgressText) globalProgressText.innerText = `Evolução Global: ${readinessScore}%`;
-    if (globalProgressBar) globalProgressBar.style.width = `${readinessScore}%`;
-    if (readinessHero) readinessHero.innerText = `${readinessScore}%`;
-
-    renderPetStatus();
-    renderActiveCourses();
-    renderHabitsTable();
-    updatePomodoroDisplay();
+// Função para remover uma disciplina
+window.removeCourse = function(courseId) {
+    if (confirm("Deseja realmente remover esta disciplina da sua grade ativa?")) {
+        MentoriiCore.state.activeCourses = MentoriiCore.state.activeCourses.filter(c => c.id !== courseId);
+        MentoriiCore.save();
+        renderDashboard();
+    }
 };
 
 // ============================================================
@@ -423,6 +433,116 @@ function applyParsedPDI(rawContent, sourceName) {
 }
 
 // ============================================================
+// REMOVER / DESFAZER INDEXAÇÃO DE PDI
+// ============================================================
+window.clearIndexedPDI = function() {
+    if (confirm("Deseja realmente remover o PDI indexado atual? As disciplinas ativas serão mantidas, mas o vínculo com o arquivo será desfeito para permitir uma nova importação.")) {
+        
+        // Limpa a propriedade do arquivo no estado
+        if (MentoriiCore.state.profile) {
+            MentoriiCore.state.profile.indexedFileName = "";
+        }
+
+        // Esconde a caixa do status no modal
+        const statusBox = document.getElementById('pdi-file-status-box');
+        const filenameLabel = document.getElementById('pdi-filename-label');
+        if (statusBox) statusBox.style.display = 'none';
+        if (filenameLabel) filenameLabel.innerText = "Nenhum";
+
+        // Reseta o input de arquivo físico para permitir subir o mesmo arquivo se quiser
+        const fileInput = document.getElementById('pdi-file-input-element');
+        if (fileInput) fileInput.value = "";
+
+        // Reseta a caixa de texto colado
+        const pasteInput = document.getElementById('paste-pdi-json-input');
+        if (pasteInput) pasteInput.value = "";
+
+        MentoriiCore.save();
+        renderDashboard();
+
+        alert("🧹 Indexação removida! Agora você pode carregar ou colar um novo arquivo de PDI.");
+    }
+};
+
+// ============================================================
+// CALENDÁRIO MENSAL E AGENDA DE COMPROMISSOS
+// ============================================================
+window.renderCalendarGrid = function() {
+    const grid = document.getElementById('calendar-monthly-grid');
+    if (!grid) return;
+
+    grid.innerHTML = "";
+    const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    
+    daysOfWeek.forEach(day => {
+        const header = document.createElement('div');
+        header.style.fontWeight = 'bold';
+        header.style.padding = '6px';
+        header.style.color = 'var(--purple)';
+        header.innerText = day;
+        grid.appendChild(header);
+    });
+
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dayCell = document.createElement('div');
+        dayCell.style.border = '1px solid var(--border-light)';
+        dayCell.style.padding = '8px';
+        dayCell.style.borderRadius = 'var(--radius-sm)';
+        dayCell.style.background = (i === now.getDate()) ? 'var(--purple-light)' : 'var(--bg-card)';
+        dayCell.innerText = i;
+        grid.appendChild(dayCell);
+    }
+
+    renderAgendaEventsList();
+};
+
+window.addNewAgendaEvent = function() {
+    const title = prompt("Digite o título do compromisso:");
+    if (!title) return;
+    const dateStr = prompt("Digite a data (Ex: 15/08):", "Hoje");
+
+    if (!MentoriiCore.state.agenda) MentoriiCore.state.agenda = [];
+    
+    MentoriiCore.state.agenda.push({
+        id: `evt_${Date.now()}`,
+        title: title,
+        date: dateStr || "Hoje"
+    });
+
+    MentoriiCore.save();
+    renderAgendaEventsList();
+};
+
+window.renderAgendaEventsList = function() {
+    const container = document.getElementById('agenda-events-list');
+    if (!container) return;
+
+    const events = MentoriiCore.state.agenda || [];
+    container.innerHTML = "";
+
+    if (events.length === 0) {
+        container.innerHTML = `<div style="font-size:12px; color:var(--text-dim);">Nenhum compromisso agendado.</div>`;
+        return;
+    }
+
+    events.forEach(evt => {
+        const item = document.createElement('div');
+        item.style.cssText = "display:flex; justify-content:space-between; padding:8px 12px; background:var(--bg-subtle); border-radius:var(--radius-sm); font-size:12px;";
+        item.innerHTML = `<span>📌 <strong>${evt.title}</strong> (${evt.date})</span><button onclick="removeAgendaEvent('${evt.id}')" style="color:var(--red); border:none; background:none; cursor:pointer;">🗑️</button>`;
+        container.appendChild(item);
+    });
+};
+
+window.removeAgendaEvent = function(id) {
+    MentoriiCore.state.agenda = MentoriiCore.state.agenda.filter(e => e.id !== id);
+    MentoriiCore.save();
+    renderAgendaEventsList();
+};
+
+// ============================================================
 // 9. TEMAS E BACKUP
 // ============================================================
 window.setTheme = function(themeName) {
@@ -493,6 +613,21 @@ window.openOnboardingModal = function() {
         statusBox.style.display = 'flex';
         filenameLabel.innerText = indexedName;
         if (timeLabel) timeLabel.innerText = "Ativo";
+    }
+};
+
+// FUNÇÃO DE AUXÍLIO PARA COPIAR PROMPT DE IA
+window.copyAIPromptToClipboard = function() {
+    const promptText = "Atue como meu tutor de carreira e estudos. Monte um Plano de Desenvolvimento Individual (PDI) para o meu objetivo. Liste as frentes e disciplinas de estudo principais em um formato claro em tópicos ou JSON.";
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(promptText).then(() => {
+            alert("📋 Prompt copiado com sucesso!\n\nCole no Claude, ChatGPT ou Gemini e depois traga a resposta em JSON ou texto para a caixa do Mentorii.");
+        }).catch(() => {
+            prompt("Copie o prompt abaixo para usar na IA:", promptText);
+        });
+    } else {
+        prompt("Copie o prompt abaixo para usar na IA:", promptText);
     }
 };
 
