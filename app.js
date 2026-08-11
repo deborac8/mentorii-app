@@ -495,3 +495,107 @@ window.openOnboardingModal = function() {
         if (timeLabel) timeLabel.innerText = "Ativo";
     }
 };
+
+// REGISTRO SEGURO DE EVENTOS (DOM Event Listeners)
+document.addEventListener("DOMContentLoaded", function () {
+    const fileBtn = document.getElementById('btn-trigger-file-input');
+    const fileInput = document.getElementById('pdi-file-input-element');
+    const pasteToggleBtn = document.getElementById('btn-trigger-paste-box');
+    const applyPastedBtn = document.getElementById('btn-apply-pasted-pdi');
+
+    // 1. Clique para abrir a janela de arquivos
+    if (fileBtn && fileInput) {
+        fileBtn.addEventListener('click', function () {
+            fileInput.click();
+        });
+    }
+
+    // 2. Evento de seleção de arquivo
+    if (fileInput) {
+        fileInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                processPDIContent(evt.target.result, file.name);
+                fileInput.value = ""; // Reseta o input
+            };
+            reader.onerror = function () {
+                alert("❌ Erro ao ler o arquivo no navegador.");
+                fileInput.value = "";
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    // 3. Alternar visibilidade da caixa de colar
+    if (pasteToggleBtn) {
+        pasteToggleBtn.addEventListener('click', function () {
+            const container = document.getElementById('paste-pdi-container');
+            if (container) {
+                container.style.display = (container.style.display === 'none' || container.style.display === '') ? 'block' : 'none';
+            }
+        });
+    }
+
+    // 4. Aplicar texto colado
+    if (applyPastedBtn) {
+        applyPastedBtn.addEventListener('click', function () {
+            const text = (document.getElementById('paste-pdi-json-input') || {}).value || "";
+            if (!text.trim()) {
+                alert("⚠️ Cole o conteúdo do PDI na caixa antes de aplicar.");
+                return;
+            }
+            processPDIContent(text, "Texto/JSON Colado");
+        });
+    }
+});
+
+// PROCESSADOR CENTRALIZADO DE PDI
+function processPDIContent(rawContent, sourceName) {
+    try {
+        // Validação defensiva do MentoriiCore
+        if (typeof MentoriiCore === "undefined") {
+            alert("❌ O arquivo mentorii-core.js ainda não foi carregado pelo navegador. Recarregue a página (Ctrl+F5) e tente novamente.");
+            return;
+        }
+
+        if (!window.MentoriiOracle) {
+            alert("❌ O motor analítico (oracle.js) não foi encontrado.");
+            return;
+        }
+
+        const parsed = MentoriiOracle.parsePDIStructure(rawContent);
+
+        if (parsed && parsed.activeCourses && parsed.activeCourses.length > 0) {
+            if (parsed.profile.targetGoal) MentoriiCore.state.profile.targetGoal = parsed.profile.targetGoal;
+            if (parsed.profile.surgeryFocus) MentoriiCore.state.profile.surgeryFocus = parsed.profile.surgeryFocus;
+            MentoriiCore.state.activeCourses = parsed.activeCourses;
+
+            // Registra nome do arquivo indexado
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            MentoriiCore.state.profile.indexedFileName = `${sourceName} (Indexado às ${timeStr})`;
+
+            // Atualiza UI
+            const statusBox = document.getElementById('pdi-file-status-box');
+            const nameLabel = document.getElementById('pdi-filename-label');
+            const timeLabel = document.getElementById('pdi-indexed-time');
+
+            if (statusBox) statusBox.style.display = 'flex';
+            if (nameLabel) nameLabel.innerText = sourceName;
+            if (timeLabel) timeLabel.innerText = timeStr;
+
+            MentoriiCore.save();
+            if (typeof closeOnboardingModal === 'function') closeOnboardingModal();
+            if (typeof renderDashboard === 'function') renderDashboard();
+
+            alert(`🎉 PDI Importado com sucesso!\n\nFonte: ${sourceName}\n${parsed.activeCourses.length} disciplina(s) carregada(s).`);
+        } else {
+            alert("❌ Nenhuma disciplina foi identificada no arquivo fornecido.");
+        }
+    } catch (err) {
+        console.error("Erro na leitura do PDI:", err);
+        alert(`⚠️ Erro ao processar arquivo: ${err.message}`);
+    }
+}
