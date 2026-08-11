@@ -44,6 +44,23 @@
             </div>
         </header>
 
+        <!-- TOPBAR UNIVERSAL -->
+        <header class="topbar">
+            <div>
+                <div class="eyebrow" id="user-profile-type">SISTEMA ADAPTATIVO DE ESTUDOS</div>
+                <h1 id="user-pdi-title">Mentorii Cockpit</h1>
+                <p class="topbar-description" id="user-pdi-desc">Painel de execução diária, gestão de grades e foco cirúrgico em frentes específicas.</p>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn-icon-help" onclick="openHelpModal()" title="Como usar o Mentorii">❓</button>
+                <button type="button" class="btn-action" onclick="openOnboardingModal()">✨ Gerar/Refazer PDI (IA)</button>
+                <button type="button" class="btn-backup" onclick="exportBackupJSON()">💾 Backup</button>
+                <button type="button" class="btn-backup" onclick="document.getElementById('import-json-file').click()">📂 Restaurar</button>
+                <button type="button" class="btn-backup" style="color: var(--red); border-color: var(--red-light);" onclick="logoutUser()">🚪 Sair</button>
+                <input type="file" id="import-json-file" style="display:none" onchange="importBackupJSON(event)">
+            </div>
+        </header>
+
         <!-- ============================================================ -->
         <!-- SEÇÃO 3: PROGRESSO MACRO & CONTADOR DE STREAK                -->
         <!-- Barra superior de avanço global e indicador de dias ativos.  -->
