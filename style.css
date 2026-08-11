@@ -294,24 +294,33 @@ body {
 }
 
 /* ============================================================ */
-/* SEÇÃO 6: NAVEGAÇÃO DE ABAS UNIVERSAIS (.nav-tabs)            */
-/* Layout com rolagem horizontal suave e indicador de aba ativa.*/
+/* SEÇÃO 6: NAVEGAÇÃO DE ABAS RESPONSIVA & INTERATIVA           */
+/* Em tela cheia: visibilidade total em wrap.                    */
+/* Em telas menores: scroll horizontal suave.                   */
 /* ============================================================ */
 .nav-tabs {
     display: flex;
+    flex-wrap: wrap; /* Em tela cheia mostra todas as abas sem esconder */
     gap: 8px;
-    overflow-x: auto;
     padding-bottom: 6px;
-    scrollbar-width: thin;
 }
 
-.nav-tabs::-webkit-scrollbar {
-    height: 4px;
-}
+/* Em telas menores que 900px, habilita a rolagem horizontal */
+@media (max-width: 900px) {
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: thin;
+    }
 
-.nav-tabs::-webkit-scrollbar-thumb {
-    background-color: var(--border);
-    border-radius: 4px;
+    .nav-tabs::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .nav-tabs::-webkit-scrollbar-thumb {
+        background-color: var(--border);
+        border-radius: 4px;
+    }
 }
 
 .tab-btn {
@@ -324,19 +333,23 @@ body {
     font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
-    cursor: pointer;
+    cursor: pointer !important; /* Garante o cursor clicável */
+    user-select: none;
+    transition: all 0.2s ease;
 }
 
 .tab-btn:hover {
-    color: var(--text);
+    color: var(--purple);
     border-color: var(--purple);
+    background-color: var(--purple-light);
+    transform: translateY(-1px);
 }
 
 .tab-btn.active {
     background-color: var(--purple);
     color: #ffffff;
     border-color: var(--purple);
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .tab-btn.tab-backlog {
