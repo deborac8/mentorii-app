@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="pastel">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentorii — Entrar ou Criar Conta</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos específicos da página de Auth para centralizar o cartão na tela */
+        body.auth-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-main) 0%, var(--purple-light) 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-logo {
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--purple);
+            letter-spacing: -0.03em;
+        }
+
+        .auth-tagline {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .auth-tabs-toggle {
+            display: flex;
+            background-color: var(--bg-subtle);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 8px;
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+
+        .auth-tab-btn.active {
+            background-color: var(--bg-card);
+            color: var(--purple);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .auth-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .auth-field label {
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .btn-auth-submit {
+            background-color: var(--purple);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .btn-auth-submit:hover {
+            filter: brightness(1.08);
+        }
+
+        .auth-footer-note {
+            text-align: center;
+            font-size: 11.5px;
+            color: var(--text-dim);
+            margin-top: 18px;
+        }
+
+        .auth-guest-link {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+    <div class="auth-card">
+        <!-- LOGO & APRESENTAÇÃO -->
+        <div class="auth-header">
+            <div class="eyebrow">ECOSSISTEMA ADAPTATIVO</div>
+            <div class="auth-logo">Mentorii</div>
+            <p class="auth-tagline">Seu Cockpit Inteligente de Estudos & Gestão de Carreira</p>
+        </div>
+
+        <!-- SELETOR ENTRE LOGIN E CADASTRO -->
+        <div class="auth-tabs-toggle">
+            <button class="auth-tab-btn active" id="btn-tab-login" onclick="toggleAuthMode('login')">Entrar</button>
+            <button class="auth-tab-btn" id="btn-tab-register" onclick="toggleAuthMode('register')">Criar Conta</button>
+        </div>
+
+        <!-- FORMULÁRIO DINÂMICO DE AUTENTICAÇÃO -->
+        <form class="auth-form" id="auth-main-form" onsubmit="handleAuthSubmit(event)">
+            <!-- CAMPO NOME (EXIBIDO NO CADASTRO) -->
+            <div class="auth-field" id="field-name-group" style="display: none;">
+                <label for="auth-user-name">Seu Nome / Apelido</label>
+                <input type="text" id="auth-user-name" class="input-text" placeholder="Ex: Débora Marra">
+            </div>
+
+            <!-- CAMPO E-MAIL -->
+            <div class="auth-field">
+                <label for="auth-email">E-mail</label>
+                <input type="email" id="auth-email" class="input-text" placeholder="seu.email@exemplo.com" required>
+            </div>
+
+            <!-- CAMPO SENHA -->
+            <div class="auth-field">
+                <label for="auth-password">Senha</label>
+                <input type="password" id="auth-password" class="input-text" placeholder="••••••••" required>
+            </div>
+
+            <!-- PERFIL DE ESTUDANTE (EXIBIDO NO CADASTRO) -->
+            <div class="auth-field" id="field-profile-group" style="display: none;">
+                <label for="auth-profile-type">Perfil de Estudo Principal</label>
+                <select id="auth-profile-type" class="select-priority" style="width: 100%;">
+                    <option value="vestibular">🎓 Vestibular / ENEM / Concursos</option>
+                    <option value="tech">💻 Tecnologia / Engenharia / Estágio</option>
+                    <option value="faculdade">📚 Graduação / Faculdade Geral</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-auth-submit" id="auth-submit-btn">Entrar no Cockpit</button>
+        </form>
+
+        <!-- MODO CONVIDADO / RODAPÉ -->
+        <div class="auth-footer-note">
+            Quer testar sem criar conta? 
+            <span class="auth-guest-link" onclick="enterAsGuest()">Entrar como Convidado &rarr;</span>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE INTERAÇÃO DA TELA DE AUTH -->
+    <script>
+        let currentAuthMode = 'login';
+
+        function toggleAuthMode(mode) {
+            currentAuthMode = mode;
+            const nameGroup = document.getElementById('field-name-group');
+            const profileGroup = document.getElementById('field-profile-group');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const tabLogin = document.getElementById('btn-tab-login');
+            const tabRegister = document.getElementById('btn-tab-register');
+
+            if (mode === 'register') {
+                nameGroup.style.display = 'flex';
+                profileGroup.style.display = 'flex';
+                submitBtn.innerText = 'Criar Minha Conta & Iniciar PDI';
+                tabRegister.classList.add('active');
+                tabLogin.classList.remove('active');
+            } else {
+                nameGroup.style.display = 'none';
+                profileGroup.style.display = 'none';
+                submitBtn.innerText = 'Entrar no Cockpit';
+                tabLogin.classList.add('active');
+                tabRegister.classList.remove('active');
+            }
+        }
+
+        function handleAuthSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const name = document.getElementById('auth-user-name').value || 'Estudante';
+            const profile = document.getElementById('auth-profile-type').value;
+
+            // Salva os dados da sessão do usuário no LocalStorage
+            const sessionData = {
+                loggedIn: true,
+                userName: currentAuthMode === 'register' ? name : (email.split('@')[0]),
+                userEmail: email,
+                profileType: profile,
+                createdAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('mentorii_user_session', JSON.stringify(sessionData));
+
+            // Redireciona para o Cockpit principal
+            window.location.href = 'index.html';
+        }
+
+        function enterAsGuest() {
+            const guestData = {
+                loggedIn: true,
+                userName: 'Estudante Convidado',
+                userEmail: 'convidado@mentorii.app',
+                profileType: 'tech',
+                isGuest: true
+            };
+            localStorage.setItem('mentorii_user_session', JSON.stringify(guestData));
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
