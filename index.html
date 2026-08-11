@@ -444,3 +444,70 @@
 </body>
 </html>
 
+<!-- TAB 12: GRADE CURRICULAR & GRADE HORÁRIA -->
+<div id="tab-grade" class="tab-content" style="display:none; flex-direction:column; gap:16px;">
+    
+    <!-- QUADRO DE AULAS / GRADE HORÁRIA SEMANAL -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div>
+                <h3>🎓 Grade Horária Semanal</h3>
+                <p style="font-size:12px; color:var(--text-dim);">Mapeamento de aulas, horários e dias da semana.</p>
+            </div>
+            <button type="button" class="btn-action" style="font-size:11px;" onclick="addNewClassSchedule()">+ Adicionar Horário de Aula</button>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px; font-family:var(--mono); text-align:center;">
+                <thead>
+                    <tr style="background:var(--bg-subtle); color:var(--purple); border-bottom:2px solid var(--border);">
+                        <th style="padding:8px;">Horário</th>
+                        <th style="padding:8px;">Segunda</th>
+                        <th style="padding:8px;">Terça</th>
+                        <th style="padding:8px;">Quarta</th>
+                        <th style="padding:8px;">Quinta</th>
+                        <th style="padding:8px;">Sexta</th>
+                        <th style="padding:8px;">Sábado</th>
+                    </tr>
+                </thead>
+                <tbody id="weekly-schedule-tbody">
+                    <!-- Renderizado dinamicamente via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MÓDULO DE INTEGRAÇÃO COM TRELLO -->
+    <div class="card" style="border:1px dashed var(--purple);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div>
+                <h3>📌 Importação de Cursos & Grade via Trello</h3>
+                <p style="font-size:12px; color:var(--text-dim);">Conecte seu Board do Trello ou cole o JSON exportado do Trello.</p>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+            <button type="button" class="btn-backup" style="font-size:11px;" onclick="toggleTrelloAPIBox()">🔑 Configurar API Key do Trello</button>
+            <button type="button" class="btn-backup" style="font-size:11px;" onclick="document.getElementById('trello-json-file-input').click()">📄 Importar JSON do Trello</button>
+            <input type="file" id="trello-json-file-input" style="display:none" accept=".json" onchange="importTrelloJSONFile(event)">
+        </div>
+
+        <!-- PAINEL DE CONEXÃO DIRETA API TRELLO -->
+        <div id="trello-api-config-box" style="display:none; background:var(--bg-subtle); padding:12px; border-radius:var(--radius-sm); margin-top:10px;">
+            <div class="form-group mb-10">
+                <label style="font-size:11px; font-family:var(--mono); font-weight:bold;">1. Trello API Key:</label>
+                <input type="text" id="trello-api-key" class="input-text" placeholder="Cole sua API Key do Trello" style="width:100%;">
+            </div>
+            <div class="form-group mb-10" style="margin-top:8px;">
+                <label style="font-size:11px; font-family:var(--mono); font-weight:bold;">2. Trello Token:</label>
+                <input type="text" id="trello-token" class="input-text" placeholder="Cole seu Token do Trello" style="width:100%;">
+            </div>
+            <div class="form-group mb-10" style="margin-top:8px;">
+                <label style="font-size:11px; font-family:var(--mono); font-weight:bold;">3. ID ou Shortcode do Board:</label>
+                <input type="text" id="trello-board-id" class="input-text" placeholder="Ex: bX7y9K1z" style="width:100%;">
+            </div>
+            <button type="button" class="btn-action" style="font-size:11px; margin-top:8px; width:100%;" onclick="fetchTrelloBoardData()">🚀 Sincronizar Cards do Trello</button>
+        </div>
+    </div>
+</div>
+

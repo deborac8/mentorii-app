@@ -734,3 +734,147 @@ function processPDIContent(rawContent, sourceName) {
         alert(`⚠️ Erro ao processar arquivo: ${err.message}`);
     }
 }
+
+// ============================================================
+// 1. GESTÃO DA GRADE HORÁRIA SEMANAL
+// ============================================================
+window.renderWeeklyScheduleTable = function() {
+    const tbody = document.getElementById('weekly-schedule-tbody');
+    if (!tbody) return;
+
+    const schedule = MentoriiCore.state.classSchedule || [];
+    tbody.innerHTML = "";
+
+    if (schedule.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="padding:16px; color:var(--text-dim);">Nenhum horário cadastrado. Clique em "+ Adicionar Horário de Aula".</td></tr>`;
+        return;
+    }
+
+    schedule.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = "1px solid var(--border-light)";
+        tr.innerHTML = `
+            <td style="padding:8px; font-weight:bold; color:var(--purple);">${row.time}</td>
+            <td style="padding:8px;">${row.seg || '-'}</td>
+            <td style="padding:8px;">${row.ter || '-'}</td>
+            <td style="padding:8px;">${row.qua || '-'}</td>
+            <td style="padding:8px;">${row.qui || '-'}</td>
+            <td style="padding:8px;">${row.sex || '-'}</td>
+            <td style="padding:8px;">${row.sab || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+};
+
+window.addNewClassSchedule = function() {
+    const timeStr = prompt("Horário da Aula (Ex: 08:00 - 10:00):", "08:00 - 10:00");
+    if (!timeStr) return;
+
+    const seg = prompt("Matéria na Segunda-feira:", "");
+    const ter = prompt("Matéria na Terça-feira:", "");
+    const qua = prompt("Matéria na Quarta-feira:", "");
+    const qui = prompt("Matéria na Quinta-feira:", "");
+    const sex = prompt("Matéria na Sexta-feira:", "");
+
+    if (!MentoriiCore.state.classSchedule) MentoriiCore.state.classSchedule = [];
+
+    MentoriiCore.state.classSchedule.push({
+        id: `sch_${Date.now()}`,
+        time: timeStr,
+        seg: seg, ter: ter, qua: qua, qui: qui, sex: sex, sab: ""
+    });
+
+    MentoriiCore.save();
+    renderWeeklyScheduleTable();
+};
+
+// ============================================================
+// 2. INTEGRAÇÃO E IMPORTAÇÃO DO TRELLO
+// ============================================================
+window.toggleTrelloAPIBox = function() {
+    const box = document.getElementById('trello-api-config-box');
+    if (box) {
+        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+    }
+};
+
+// A) Importar Trello via JSON Exportado
+window.importTrelloJSONFile = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const trelloData = JSON.parse(e.target.result);
+            processTrelloBoardJSON(trelloData);
+        } catch (err) {
+            alert("❌ O arquivo selecionado não é um JSON válido do Trello.");
+        }
+    };
+    reader.readAsText(file);
+};
+
+// B) Importar Trello via API Oficial
+window.fetchTrelloBoardData = async function() {
+    const key = document.getElementById('trello-api-key').value.trim();
+    const token = document.getElementById('trello-token').value.trim();
+    const boardId = document.getElementById('trello-board-id').value.trim();
+
+    if (!key || !token || !boardId) {
+        alert("⚠️ Preencha a API Key, o Token e o ID do Board para sincronizar com o Trello.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://api.trello.com/1/boards/${boardId}/cards?key=${key}&token=${token}`);
+        if (!response.ok) throw new Error("Falha na autenticação com o Trello.");
+
+        const cards = await response.json();
+        
+        if (Array.isArray(cards) && cards.length > 0) {
+            const importedCourses = cards.map((card, idx) => ({
+                id: `c_trello_${card.id}`,
+                name: card.name,
+                label: "Trello Card",
+                completed: card.closed || false,
+                items: [{ id: `i_${idx}`, name: "Estudo Solo e Resolução", done: false }]
+            }));
+
+            // Adiciona às disciplinas ativas
+            MentoriiCore.state.activeCourses = [...MentoriiCore.state.activeCourses, ...importedCourses];
+            MentoriiCore.save();
+            renderDashboard();
+
+            alert(`🎉 Sincronização Concluída!\n\n${importedCourses.length} card(s) importado(s) do Trello para o Mentorii!`);
+        } else {
+            alert("⚠️ Nenhum card foi encontrado no board selecionado.");
+        }
+    } catch (err) {
+        alert(`❌ Erro ao conectar com o Trello: ${err.message}`);
+    }
+};
+
+// Processador de JSON exportado do Trello
+function processTrelloBoardJSON(trelloData) {
+    if (!trelloData || !Array.isArray(trelloData.cards)) {
+        alert("❌ O arquivo não possui a estrutura de cards do Trello.");
+        return;
+    }
+
+    const cards = trelloData.cards.filter(c => !c.closed); // Filtra apenas cards ativos
+    const importedCourses = cards.map((card, idx) => ({
+        id: `c_trello_json_${idx}_${Date.now()}`,
+        name: card.name,
+        label: "Importado do Trello",
+        completed: false,
+        items: [{ id: `i_${idx}`, name: "Estudo Solo e Exercícios", done: false }]
+    }));
+
+    MentoriiCore.state.activeCourses = [...MentoriiCore.state.activeCourses, ...importedCourses];
+    MentoriiCore.save();
+    renderDashboard();
+
+    alert(`🎉 Importação do Trello Concluída!\n\n${importedCourses.length} card(s) transformado(s) em disciplinas no Mentorii!`);
+    if (tabId === 'tab-grade') renderWeeklyScheduleTable();
+}
