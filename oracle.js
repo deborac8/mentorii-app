@@ -1,15 +1,12 @@
 /* ============================================================ */
 /* MENTORII — ENGINE DO ORÁCULO DE IA & DIAGNÓSTICO (oracle.js)  */
-/* Conexão com API de IA em tempo real e parse de PDI.          */
+/* Extrator universal flexível para JSON, Markdown, HTML e Texto */
 /* ============================================================ */
 
 const MentoriiOracle = {
 
     /**
      * Faz a chamada à API da IA para gerar um diagnóstico cirúrgico em tempo real.
-     * @param {Object} userData - Objeto contendo o PDI e estado atual do usuário.
-     * @param {string} apiKey - Chave de API (OpenAI ou Gemini).
-     * @returns {Promise<string>} Análise gerada pela IA.
      */
     generateAIDiagnosis: async function(userData, apiKey) {
         if (!apiKey) {
@@ -33,7 +30,6 @@ const MentoriiOracle = {
         `;
 
         try {
-            // Exemplo de integração usando a API da OpenAI (pode ser adaptado para Gemini/Claude)
             const response = await fetch("https://api.openai.com/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -51,9 +47,7 @@ const MentoriiOracle = {
                 })
             });
 
-            if (!response.ok) {
-                throw new Error("Falha na resposta da API de IA");
-            }
+            if (!response.ok) throw new Error("Falha na resposta da API");
 
             const data = await response.json();
             return data.choices[0]?.message?.content || this.generateFallbackRecommendation(userData);
@@ -65,7 +59,7 @@ const MentoriiOracle = {
     },
 
     /**
-     * Diagnóstico Local (Fallback offline rápido sem consumo de API)
+     * Diagnóstico Local (Fallback offline rápido)
      */
     generateFallbackRecommendation: function(userData) {
         if (!userData || !userData.activeCourses || userData.activeCourses.length === 0) {
@@ -106,31 +100,105 @@ const MentoriiOracle = {
     },
 
     /**
-     * Parse e sanitização de PDI em formato JSON
+     * EXTRACTOR ULTRA-FLEXÍVEL:
+     * Aceita JSON, Markdown, HTML ou listas de texto puro coladas do Claude.
      */
     parsePDIStructure: function(rawInput) {
-        let parsedData = rawInput;
-        if (typeof rawInput === "string") {
+        if (!rawInput || String(rawInput).trim().length === 0) return null;
+
+        let cleanText = String(rawInput).trim();
+
+        // 1. Remove formatações Markdown (```json ... ``` e ```html ... ```)
+        cleanText = cleanText.replace(/```json/gi, '').replace(/```html/gi, '').replace(/```/g, '').trim();
+
+        let parsedData = null;
+
+        // 2. Tenta extrair um objeto JSON de dentro do texto
+        const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
             try {
-                parsedData = JSON.parse(rawInput);
+                parsedData = JSON.parse(jsonMatch[0]);
             } catch (e) {
-                console.error("Erro ao converter JSON do PDI:", e);
-                return null;
+                console.warn("JSON parcial ou corrompido, ativando leitor de texto puro/HTML...", e);
             }
         }
 
+        // 3. Se um JSON válido foi encontrado, formata e retorna
+        if (parsedData) {
+            let courses = [];
+            
+            if (Array.isArray(parsedData.activeCourses) && parsedData.activeCourses.length > 0) {
+                courses = parsedData.activeCourses;
+            } else if (Array.isArray(parsedData.disciplinas) && parsedData.disciplinas.length > 0) {
+                courses = parsedData.disciplinas.map((d, i) => ({
+                    id: `c_${i}_${Date.now()}`,
+                    name: typeof d === 'string' ? d : (d.nome || d.name || "Disciplina"),
+                    label: d.label || "Frente Prioritária",
+                    completed: false,
+                    items: [{ id: `i_${i}`, name: "Estudo Solo e Resolução", done: false }]
+                }));
+            } else if (Array.isArray(parsedData.courses) && parsedData.courses.length > 0) {
+                courses = parsedData.courses.map((d, i) => ({
+                    id: `c_${i}_${Date.now()}`,
+                    name: typeof d === 'string' ? d : (d.name || d.nome || "Disciplina"),
+                    label: "Frente Prioritária",
+                    completed: false,
+                    items: [{ id: `i_${i}`, name: "Estudo Solo e Resolução", done: false }]
+                }));
+            }
+
+            return {
+                profile: {
+                    name: parsedData.profile?.name || parsedData.name || "Estudante",
+                    profileType: parsedData.profile?.profileType || "general",
+                    targetGoal: parsedData.profile?.targetGoal || parsedData.targetGoal || "PDI Importado via IA",
+                    surgeryFocus: parsedData.profile?.surgeryFocus || parsedData.surgeryFocus || "",
+                    schedule: parsedData.profile?.schedule || ""
+                },
+                activeCourses: courses,
+                incubatedCourses: Array.isArray(parsedData.incubatedCourses) ? parsedData.incubatedCourses : [],
+                habits: Array.isArray(parsedData.habits) ? parsedData.habits : [],
+                agenda: Array.isArray(parsedData.agenda) ? parsedData.agenda : []
+            };
+        }
+
+        // 4. FALLBACK PARSER DE TEXTO/HTML (quando cola HTML ou texto em tópicos do Claude)
+        // Remove tags HTML substituindo por quebras de linha
+        const strippedText = cleanText.replace(/<[^>]*>/g, '\n');
+        const rawLines = strippedText.split('\n')
+            .map(l => l.trim())
+            .filter(l => l.length > 2 && !l.toLowerCase().includes('html') && !l.toLowerCase().includes('doctype'));
+
+        if (rawLines.length === 0) return null;
+
+        // Filtra tópicos ou títulos para transformar em matérias
+        const extractedCourses = rawLines
+            .filter(line => !line.startsWith('{') && !line.startsWith('}'))
+            .map(line => line.replace(/^[•\-\*\d\.\)\:]+\s*/, '').trim()) // Limpa marcadores como '1.', '-', '•'
+            .filter(line => line.length >= 3 && line.length <= 80)
+            .slice(0, 20)
+            .map((courseName, idx) => ({
+                id: `c_colado_${idx}_${Date.now()}`,
+                name: courseName,
+                label: "Importado do Claude",
+                completed: false,
+                items: [{ id: `i_${idx}`, name: "Estudo e Resolução Solo", done: false }]
+            }));
+
+        if (extractedCourses.length === 0) return null;
+
         return {
             profile: {
-                name: parsedData.profile?.name || "Estudante",
-                profileType: parsedData.profile?.profileType || "general",
-                targetGoal: parsedData.profile?.targetGoal || "Meta de Estudos",
-                surgeryFocus: parsedData.profile?.surgeryFocus || "",
-                schedule: parsedData.profile?.schedule || ""
+                name: "Estudante",
+                profileType: "general",
+                targetGoal: "PDI Importado via IA/Texto",
+                surgeryFocus: extractedCourses[0]?.name ? `Foco em ${extractedCourses[0].name}` : "Prática e Resolução Solo",
+                schedule: ""
             },
-            activeCourses: Array.isArray(parsedData.activeCourses) ? parsedData.activeCourses : [],
-            incubatedCourses: Array.isArray(parsedData.incubatedCourses) ? parsedData.incubatedCourses : [],
-            habits: Array.isArray(parsedData.habits) ? parsedData.habits : [],
-            agenda: Array.isArray(parsedData.agenda) ? parsedData.agenda : []
+            activeCourses: extractedCourses,
+            incubatedCourses: [],
+            habits: [],
+            agenda: []
         };
     }
 };

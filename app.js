@@ -479,3 +479,66 @@ function applyParsedPDI(rawContent) {
         alert("❌ Não foi possível interpretar a estrutura do PDI. Verifique se o formato do JSON está correto.");
     }
 }
+
+// ============================================================
+// FUNÇÕES DE IMPORTAÇÃO RÁPIDA DE PDI NO MODAL
+// ============================================================
+function togglePastePDIBox() {
+    const box = document.getElementById('paste-pdi-container');
+    if (box) {
+        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+    }
+}
+
+function importPDIFromFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        applyParsedPDI(e.target.result);
+    };
+    reader.readAsText(file);
+}
+
+function importPDIFromPastedText() {
+    const textarea = document.getElementById('paste-pdi-json-input');
+    const text = textarea ? textarea.value : "";
+
+    if (!text || text.trim().length === 0) {
+        alert("⚠️ Por favor, cole o texto, HTML ou JSON do PDI na caixa antes de clicar em aplicar.");
+        return;
+    }
+    applyParsedPDI(text);
+}
+
+function applyParsedPDI(rawContent) {
+    if (!window.MentoriiOracle) {
+        alert("❌ Erro no motor analítico do Oráculo (oracle.js não foi carregado).");
+        return;
+    }
+
+    const parsed = MentoriiOracle.parsePDIStructure(rawContent);
+
+    if (parsed) {
+        if (parsed.profile.targetGoal) {
+            MentoriiCore.state.profile.targetGoal = parsed.profile.targetGoal;
+        }
+        if (parsed.profile.surgeryFocus) {
+            MentoriiCore.state.profile.surgeryFocus = parsed.profile.surgeryFocus;
+        }
+
+        if (parsed.activeCourses && parsed.activeCourses.length > 0) {
+            MentoriiCore.state.activeCourses = parsed.activeCourses;
+        }
+
+        MentoriiCore.save();
+        closeOnboardingModal();
+        renderDashboard();
+        
+        const count = parsed.activeCourses ? parsed.activeCourses.length : 0;
+        alert(`🎉 PDI Aplicado com sucesso! ${count} disciplina(s) carregada(s) no seu Cockpit.`);
+    } else {
+        alert("❌ Não foi possível extrair matérias do texto colado. Tente colar apenas a lista de disciplinas ou o JSON.");
+    }
+}
