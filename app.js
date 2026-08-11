@@ -1,69 +1,56 @@
 /* ============================================================ */
 /* MENTORII — CONTROLLER & INTERFACE DE USUÁRIO (app.js)        */
-/* Conecta cliques de abas, Pomodoro, PDI, temas e modais.      */
+/* Funções globais explícitas para Onboarding, PDI e Dashboard. */
 /* ============================================================ */
 
 document.addEventListener("DOMContentLoaded", function () {
-    // 1. Carrega dados de sessão ou padrão do usuário
     initUserSession();
-
-    // 2. Inicializa e renderiza a interface do Dashboard
     renderDashboard();
 
-    // 3. Garante que a primeira aba ative visualmente
     const defaultTabBtn = document.querySelector('.tab-btn.active') || document.querySelector('.tab-btn');
     if (defaultTabBtn) {
         switchTab('tab-foco', defaultTabBtn);
     }
 
-    // 4. Configura o tema visual do estado
     setupThemeFromState();
 });
 
 // ============================================================
-// 1. CARREGAMENTO DA SESSÃO DO USUÁRIO (Vindo do auth.html)
+// 1. CARREGAMENTO DA SESSÃO DO USUÁRIO
 // ============================================================
 function initUserSession() {
     const sessionRaw = localStorage.getItem('mentorii_user_session');
     if (sessionRaw) {
         try {
             const session = JSON.parse(sessionRaw);
-            if (session.userName) {
-                MentoriiCore.state.profile.name = session.userName;
-            }
-            if (session.profileType) {
-                MentoriiCore.state.profile.profileType = session.profileType;
-            }
+            if (session.userName) MentoriiCore.state.profile.name = session.userName;
+            if (session.profileType) MentoriiCore.state.profile.profileType = session.profileType;
             MentoriiCore.save();
         } catch (e) {
-            console.error("Erro ao carregar sessão de usuário:", e);
+            console.error("Erro ao carregar sessão:", e);
         }
     }
 }
 
 // ============================================================
-// 2. NAVEGAÇÃO INTERATIVA DE ABAS UNIVERSAIS (11 ABAS)
+// 2. NAVEGAÇÃO DE ABAS UNIVERSAIS
 // ============================================================
-function switchTab(tabId, element) {
-    // Esconde todo o conteúdo de abas
+window.switchTab = function(tabId, element) {
     const allContents = document.querySelectorAll('.tab-content');
     allContents.forEach(content => {
         content.classList.remove('active');
         content.style.display = 'none';
     });
 
-    // Remove estado ativo de todos os botões
     const allButtons = document.querySelectorAll('.tab-btn');
     allButtons.forEach(btn => btn.classList.remove('active'));
 
-    // Exibe a aba selecionada
     const selectedTab = document.getElementById(tabId);
     if (selectedTab) {
         selectedTab.classList.add('active');
         selectedTab.style.display = 'flex';
     }
 
-    // Destaca o botão clicado
     if (element) {
         element.classList.add('active');
     } else {
@@ -71,19 +58,15 @@ function switchTab(tabId, element) {
         if (targetBtn) targetBtn.classList.add('active');
     }
 
-    // Atualização de gráficos caso acione a aba 7
-    if (tabId === 'tab-graficos') {
-        renderCharts();
-    }
-}
+    if (tabId === 'tab-graficos') renderCharts();
+};
 
 // ============================================================
-// 3. RENDERIZAÇÃO COMPLETA DO DASHBOARD
+// 3. RENDERIZAÇÃO DO DASHBOARD
 // ============================================================
-function renderDashboard() {
+window.renderDashboard = function() {
     const state = MentoriiCore.state;
 
-    // Cabeçalho do Perfil
     const pdiTitle = document.getElementById('user-pdi-title');
     const pdiDesc = document.getElementById('user-pdi-desc');
     const profileTypeLabel = document.getElementById('user-profile-type');
@@ -92,13 +75,11 @@ function renderDashboard() {
     if (pdiDesc) pdiDesc.innerText = `Foco Cirúrgico: ${state.profile.surgeryFocus || 'Revisão e Prática Solo'}`;
     if (profileTypeLabel) profileTypeLabel.innerText = `PERFIL: ${(state.profile.profileType || 'GERAL').toUpperCase()} | ${state.profile.name || 'Estudante'}`;
 
-    // Diagnóstico do Oráculo
     const oracleText = document.getElementById('oracle-recommendation-text');
     if (oracleText && window.MentoriiOracle) {
         oracleText.innerHTML = MentoriiOracle.generateFallbackRecommendation(state);
     }
 
-    // Streak & Evolução Global
     const streakBadge = document.getElementById('streak-counter-badge');
     if (streakBadge) streakBadge.innerText = `🔥 ${state.streakDays || 1} Dias Ativos`;
 
@@ -111,17 +92,16 @@ function renderDashboard() {
     if (globalProgressBar) globalProgressBar.style.width = `${readinessScore}%`;
     if (readinessHero) readinessHero.innerText = `${readinessScore}%`;
 
-    // Atualiza Mascote RPG e Módulos
     renderPetStatus();
     renderActiveCourses();
     renderHabitsTable();
     updatePomodoroDisplay();
-}
+};
 
 // ============================================================
-// 4. MASCOTE RPG & STATUS DE ATRIBUTOS
+// 4. MASCOTE RPG
 // ============================================================
-function renderPetStatus() {
+window.renderPetStatus = function() {
     const rpg = MentoriiCore.state.rpg;
     const avatar = document.getElementById('pet-avatar');
     const title = document.getElementById('pet-name-title');
@@ -144,14 +124,14 @@ function renderPetStatus() {
     if (intVal) intVal.innerText = rpg.int;
     if (strVal) strVal.innerText = rpg.str;
     if (dexVal) dexVal.innerText = rpg.dex;
-}
+};
 
 // ============================================================
-// 5. RELÓGIO POMODORO E SPRINT DE FOCO
+// 5. RELÓGIO POMODORO
 // ============================================================
 let pomoTimerInterval = null;
 
-function startPomodoro() {
+window.startPomodoro = function() {
     const pomo = MentoriiCore.state.pomodoro;
     if (pomo.isRunning) return;
 
@@ -166,32 +146,32 @@ function startPomodoro() {
             onPomodoroCycleComplete();
         }
     }, 1000);
-}
+};
 
-function pausePomodoro() {
+window.pausePomodoro = function() {
     const pomo = MentoriiCore.state.pomodoro;
     pomo.isRunning = false;
     if (pomoTimerInterval) clearInterval(pomoTimerInterval);
-}
+};
 
-function resetPomodoroSequence() {
+window.resetPomodoroSequence = function() {
     pausePomodoro();
     const pomo = MentoriiCore.state.pomodoro;
     pomo.timeRemaining = 25 * 60;
     pomo.mode = "foco";
     pomo.currentSprint = 1;
     updatePomodoroDisplay();
-}
+};
 
-function updateTargetSprints(val) {
+window.updateTargetSprints = function(val) {
     const num = parseInt(val) || 4;
     MentoriiCore.state.pomodoro.targetSprints = num;
     MentoriiCore.save();
     const targetLabel = document.getElementById('pomo-target-sprints');
     if (targetLabel) targetLabel.innerText = num;
-}
+};
 
-function updatePomodoroDisplay() {
+window.updatePomodoroDisplay = function() {
     const pomo = MentoriiCore.state.pomodoro;
     const minutes = Math.floor(pomo.timeRemaining / 60);
     const seconds = pomo.timeRemaining % 60;
@@ -204,21 +184,21 @@ function updatePomodoroDisplay() {
     if (sprintText) sprintText.innerText = pomo.currentSprint;
     if (targetText) targetText.innerText = pomo.targetSprints || 4;
     if (modeStatus) modeStatus.innerText = pomo.mode === "foco" ? "🎯 MODO FOCO" : "☕ MODO PAUSA";
-}
+};
 
 function onPomodoroCycleComplete() {
     const pomo = MentoriiCore.state.pomodoro;
 
     if (pomo.mode === "foco") {
         MentoriiCore.addFP(10, "int");
-        alert("🎉 Sprint de Foco concluída! Você ganhou +10 Focus Points. Hora do descanso!");
+        alert("🎉 Sprint de Foco concluída! Ganhou +10 FP.");
 
         if (pomo.currentSprint < pomo.targetSprints) {
             pomo.mode = "pausa";
             pomo.timeRemaining = 5 * 60;
             startPomodoro();
         } else {
-            alert("🏆 Sequência de Sprints concluída com sucesso!");
+            alert("🏆 Sequência de Sprints concluída!");
             resetPomodoroSequence();
         }
     } else {
@@ -233,20 +213,20 @@ function onPomodoroCycleComplete() {
     renderDashboard();
 }
 
-function completeCurrentDailyTask() {
+window.completeCurrentDailyTask = function() {
     MentoriiCore.addFP(15, "str");
-    alert("⚡ Meta concluída! +15 FP adicionados ao seu mascote.");
+    alert("⚡ Meta concluída! +15 FP.");
     renderDashboard();
-}
+};
 
-function skipCurrentDailyTask() {
-    alert("⏭️ Meta pulada. Avançando para o próximo tópico da fila.");
-}
+window.skipCurrentDailyTask = function() {
+    alert("⏭️ Meta pulada.");
+};
 
 // ============================================================
 // 6. DISCIPLINAS & HÁBITOS
 // ============================================================
-function renderActiveCourses() {
+window.renderActiveCourses = function() {
     const container = document.getElementById('active-courses-module-container');
     if (!container) return;
 
@@ -254,7 +234,7 @@ function renderActiveCourses() {
     container.innerHTML = "";
 
     if (!courses || courses.length === 0) {
-        container.innerHTML = `<div style="color:var(--text-dim); font-size:12px; font-family:var(--mono);">Nenhuma disciplina ativa cadastrada. Clique no botão acima para adicionar.</div>`;
+        container.innerHTML = `<div style="color:var(--text-dim); font-size:12px; font-family:var(--mono);">Nenhuma disciplina ativa cadastrada.</div>`;
         return;
     }
 
@@ -275,10 +255,10 @@ function renderActiveCourses() {
         `;
         container.appendChild(card);
     });
-}
+};
 
-function addNewCourse(type) {
-    const courseName = prompt("Digite o nome da nova disciplina/frente:");
+window.addNewCourse = function(type) {
+    const courseName = prompt("Digite o nome da nova disciplina:");
     if (!courseName || courseName.trim().length === 0) return;
 
     const newCourse = {
@@ -297,15 +277,15 @@ function addNewCourse(type) {
 
     MentoriiCore.save();
     renderDashboard();
-}
+};
 
-function completeCourseItem(courseId) {
+window.completeCourseItem = function(courseId) {
     MentoriiCore.addFP(15, "str");
-    alert("⚡ Progresso na disciplina registrado! +15 FP adicionados.");
+    alert("⚡ Progresso na disciplina registrado! +15 FP.");
     renderDashboard();
-}
+};
 
-function renderHabitsTable() {
+window.renderHabitsTable = function() {
     const tbody = document.getElementById('habit-table-body');
     if (!tbody) return;
 
@@ -328,46 +308,39 @@ function renderHabitsTable() {
         `;
         tbody.appendChild(tr);
     });
-}
+};
 
-function toggleHabitCheck(habitId, day) {
+window.toggleHabitCheck = function(habitId, day) {
     MentoriiCore.addFP(5, "dex");
     renderDashboard();
-}
+};
 
 // ============================================================
-// 7. TEMAS VISUAIS & MODAIS
+// 7. FUNÇÕES DE ONBOARDING & IMPORTAÇÃO DE PDI (Garantia Global)
 // ============================================================
-function setTheme(themeName) {
-    document.documentElement.setAttribute('data-theme', themeName);
-    MentoriiCore.state.theme = themeName;
-    MentoriiCore.save();
-}
-
-function setupThemeFromState() {
-    const savedTheme = MentoriiCore.state.theme || 'pastel';
-    setTheme(savedTheme);
-}
-
-function openOnboardingModal() {
+window.openOnboardingModal = function() {
     const modal = document.getElementById('onboarding-modal');
     if (modal) modal.style.display = 'flex';
-}
+};
 
-function closeOnboardingModal() {
+window.closeOnboardingModal = function() {
     const modal = document.getElementById('onboarding-modal');
     if (modal) modal.style.display = 'none';
-}
+};
 
-function submitOnboardingForm() {
-    const goal = document.getElementById('onb-goal').value;
-    const subjects = document.getElementById('onb-subjects').value;
-    const surgery = document.getElementById('onb-surgery-focus').value;
+window.submitOnboardingForm = function() {
+    const goalInput = document.getElementById('onb-goal');
+    const subjectsInput = document.getElementById('onb-subjects');
+    const surgeryInput = document.getElementById('onb-surgery-focus');
+
+    const goal = goalInput ? goalInput.value : "";
+    const subjects = subjectsInput ? subjectsInput.value : "";
+    const surgery = surgeryInput ? surgeryInput.value : "";
 
     if (goal) MentoriiCore.state.profile.targetGoal = goal;
     if (surgery) MentoriiCore.state.profile.surgeryFocus = surgery;
 
-    if (subjects) {
+    if (subjects && subjects.trim().length > 0) {
         const list = subjects.split(',').map(s => s.trim()).filter(s => s.length > 0);
         MentoriiCore.state.activeCourses = list.map((item, index) => ({
             id: `c_${index}_${Date.now()}`,
@@ -381,24 +354,89 @@ function submitOnboardingForm() {
     MentoriiCore.save();
     closeOnboardingModal();
     renderDashboard();
-    alert("✨ PDI reconfigurado com sucesso!");
+    alert("🚀 Seu Dashboard foi atualizado com sucesso com as novas metas!");
+};
+
+window.togglePastePDIBox = function() {
+    const box = document.getElementById('paste-pdi-container');
+    if (box) {
+        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
+    }
+};
+
+window.importPDIFromFile = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        applyParsedPDI(e.target.result);
+    };
+    reader.readAsText(file);
+};
+
+window.importPDIFromPastedText = function() {
+    const textarea = document.getElementById('paste-pdi-json-input');
+    const text = textarea ? textarea.value : "";
+
+    if (!text || text.trim().length === 0) {
+        alert("⚠️ Por favor, cole o conteúdo do PDI na caixa antes de clicar em aplicar.");
+        return;
+    }
+    applyParsedPDI(text);
+};
+
+function applyParsedPDI(rawContent) {
+    if (!window.MentoriiOracle) {
+        alert("❌ Motor analítico não encontrado.");
+        return;
+    }
+
+    const parsed = MentoriiOracle.parsePDIStructure(rawContent);
+
+    if (parsed) {
+        if (parsed.profile.targetGoal) MentoriiCore.state.profile.targetGoal = parsed.profile.targetGoal;
+        if (parsed.profile.surgeryFocus) MentoriiCore.state.profile.surgeryFocus = parsed.profile.surgeryFocus;
+        if (parsed.activeCourses && parsed.activeCourses.length > 0) {
+            MentoriiCore.state.activeCourses = parsed.activeCourses;
+        }
+
+        MentoriiCore.save();
+        closeOnboardingModal();
+        renderDashboard();
+        
+        const count = parsed.activeCourses ? parsed.activeCourses.length : 0;
+        alert(`🎉 PDI Importado com sucesso! ${count} disciplina(s) carregada(s).`);
+    } else {
+        alert("❌ Não foi possível ler as disciplinas. Tente digitar as matérias separadas por vírgula nos campos do formulário.");
+    }
 }
 
-function openHelpModal() {
+// ============================================================
+// 8. TEMAS E BACKUP
+// ============================================================
+window.setTheme = function(themeName) {
+    document.documentElement.setAttribute('data-theme', themeName);
+    MentoriiCore.state.theme = themeName;
+    MentoriiCore.save();
+};
+
+function setupThemeFromState() {
+    const savedTheme = MentoriiCore.state.theme || 'pastel';
+    setTheme(savedTheme);
+}
+
+window.openHelpModal = function() {
     const modal = document.getElementById('help-modal');
     if (modal) modal.style.display = 'flex';
-}
+};
 
-function closeHelpModal() {
+window.closeHelpModal = function() {
     const modal = document.getElementById('help-modal');
     if (modal) modal.style.display = 'none';
-}
+};
 
-function renderCharts() {
-    console.log("Gráficos prontos.");
-}
-
-function exportBackupJSON() {
+window.exportBackupJSON = function() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(MentoriiCore.state, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
@@ -406,9 +444,9 @@ function exportBackupJSON() {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-}
+};
 
-function importBackupJSON(event) {
+window.importBackupJSON = function(event) {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -425,120 +463,8 @@ function importBackupJSON(event) {
         }
     };
     reader.readAsText(file);
-}
+};
 
-// ============================================================
-// FUNÇÕES DE IMPORTAÇÃO RÁPIDA DE PDI NO MODAL
-// ============================================================
-function togglePastePDIBox() {
-    const box = document.getElementById('paste-pdi-container');
-    if (box) {
-        box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    }
-}
-
-function importPDIFromFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        applyParsedPDI(e.target.result);
-    };
-    reader.readAsText(file);
-}
-
-function importPDIFromPastedText() {
-    const text = document.getElementById('paste-pdi-json-input').value;
-    if (!text || text.trim().length === 0) {
-        alert("⚠️ Por favor, cole o JSON do PDI na caixa antes de aplicar.");
-        return;
-    }
-    applyParsedPDI(text);
-}
-
-function applyParsedPDI(rawContent) {
-    if (!window.MentoriiOracle) {
-        alert("Erro no motor analítico do Oráculo.");
-        return;
-    }
-
-    const parsed = MentoriiOracle.parsePDIStructure(rawContent);
-    if (parsed) {
-        MentoriiCore.state.profile.targetGoal = parsed.profile.targetGoal;
-        MentoriiCore.state.profile.surgeryFocus = parsed.profile.surgeryFocus;
-        if (parsed.activeCourses && parsed.activeCourses.length > 0) {
-            MentoriiCore.state.activeCourses = parsed.activeCourses;
-        }
-        
-        MentoriiCore.save();
-        closeOnboardingModal();
-        renderDashboard();
-        alert("🎉 PDI importado e aplicado ao seu Cockpit com sucesso!");
-    } else {
-        alert("❌ Não foi possível interpretar a estrutura do PDI. Verifique se o formato do JSON está correto.");
-    }
-}
-
-// ============================================================
-// FUNÇÕES DE IMPORTAÇÃO RÁPIDA DE PDI NO MODAL
-// ============================================================
-function togglePastePDIBox() {
-    const box = document.getElementById('paste-pdi-container');
-    if (box) {
-        box.style.display = (box.style.display === 'none' || box.style.display === '') ? 'block' : 'none';
-    }
-}
-
-function importPDIFromFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        applyParsedPDI(e.target.result);
-    };
-    reader.readAsText(file);
-}
-
-function importPDIFromPastedText() {
-    const textarea = document.getElementById('paste-pdi-json-input');
-    const text = textarea ? textarea.value : "";
-
-    if (!text || text.trim().length === 0) {
-        alert("⚠️ Por favor, cole o texto, HTML ou JSON do PDI na caixa antes de clicar em aplicar.");
-        return;
-    }
-    applyParsedPDI(text);
-}
-
-function applyParsedPDI(rawContent) {
-    if (!window.MentoriiOracle) {
-        alert("❌ Erro no motor analítico do Oráculo (oracle.js não foi carregado).");
-        return;
-    }
-
-    const parsed = MentoriiOracle.parsePDIStructure(rawContent);
-
-    if (parsed) {
-        if (parsed.profile.targetGoal) {
-            MentoriiCore.state.profile.targetGoal = parsed.profile.targetGoal;
-        }
-        if (parsed.profile.surgeryFocus) {
-            MentoriiCore.state.profile.surgeryFocus = parsed.profile.surgeryFocus;
-        }
-
-        if (parsed.activeCourses && parsed.activeCourses.length > 0) {
-            MentoriiCore.state.activeCourses = parsed.activeCourses;
-        }
-
-        MentoriiCore.save();
-        closeOnboardingModal();
-        renderDashboard();
-        
-        const count = parsed.activeCourses ? parsed.activeCourses.length : 0;
-        alert(`🎉 PDI Aplicado com sucesso! ${count} disciplina(s) carregada(s) no seu Cockpit.`);
-    } else {
-        alert("❌ Não foi possível extrair matérias do texto colado. Tente colar apenas a lista de disciplinas ou o JSON.");
-    }
+function renderCharts() {
+    console.log("Gráficos atualizados.");
 }
