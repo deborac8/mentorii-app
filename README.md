@@ -1,81 +1,201 @@
-# 🚀 Mentorii — Career Operating System & AI Portfolio
+Aqui está o texto que você enviou, devidamente editado e formatado em Markdown puro e rigoroso (com títulos corretos, listas formatadas, blocos de código ajustados, tabelas estruturadas e sem blocos soltos), indo até a seção de execução local:
 
-> **Mentorii** é um sistema operacional de carreira e estudos (*Career OS*) desenvolvido integralmente no modelo *Local-First*, projetado para gerenciar planos de desenvolvimento individual (PDI), rotinas de foco, cronogramas acadêmicos/profissionais e produtividade de alta performance com privacidade absoluta.
+🚀 Mentorii — Career Operating System
+Mentorii é um sistema operacional de carreira e estudos (Career OS) desenvolvido no modelo Local-First, projetado para transformar planos de desenvolvimento individual (PDI), estudos, rotina de foco e produtividade em um sistema único de execução e acompanhamento.
 
----
+O Mentorii combina planejamento estratégico, execução, acompanhamento de progresso, organização acadêmica/profissional e gamificação em um cockpit desenvolvido para reduzir a distância entre objetivos de longo prazo e ações concretas do dia a dia.
 
-## 🎯 Propósito do Projeto & Visão de Portfólio
+💡 Origem e Filosofia de Construção
+O Mentorii nasceu de uma necessidade prática de organização pessoal: criar uma ferramenta sob medida para centralizar a própria rotina de estudos, planejamento e execução de carreira.
 
-Este projeto foi construído não apenas para uso prático de organização pessoal, mas como uma **demonstração avançada de engenharia de software e desenvolvimento acelerado assistido por Inteligência Artificial**. 
+O projeto foi construído de forma modular e iterativa, moldado passo a passo a partir de necessidades reais e de testes contínuos:
 
-Ele evidencia a capacidade de:
-* **Concepção de Produto do Zero:** Tradução de necessidades complexas de rotina e metodologias de estudo em uma interface limpa, responsiva e focada em UX.
-* **Orquestração de IA Generativa:** Utilização do **Gemini** como co-piloto técnico para arquitetar o sistema, estruturar o design system, escrever parsers determinísticos e validar a lógica de estado em tempo real.
-* **Arquitetura Client-Side Limpa:** Construção de uma aplicação modular, multi-usuário com isolamento de dados por segurança local, utilizando JavaScript puro (*Vanilla JS*) sem dependências pesadas de frameworks.
+Evolução Baseada em Testes: Cada nova atualização passou por ciclos de validação de uso, corrigindo falhas de interface, otimizando o fluxo de dados e eliminando complexidades desnecessárias.
 
----
+Critério e Ética no Desenvolvimento: A escolha das funcionalidades e da arquitetura priorizou a autonomia, a clareza e a utilidade real do produto, mantendo uma postura transparente sobre os limites e as potencialidades de ferramentas digitais e assistidas por IA.
 
-## 🏗️ Esquema do Processo de Desenvolvimento & Arquitetura de Pastas
+🧭 Visão do Produto
+O Mentorii não pretende ser apenas mais um gerenciador de tarefas.
 
-O desenvolvimento seguiu uma abordagem iterativa e modular. O projeto foi estruturado para manter a separação de responsabilidades (*Separation of Concerns*), garantindo manutenibilidade e clareza:
+A proposta é funcionar como um Career Operating System: uma camada operacional entre aquilo que o usuário deseja alcançar e aquilo que precisa ser executado para chegar lá.
 
-```text
+Plaintext
+                  ┌─────────────────────────┐
+                  │      OBJETIVO / PDI     │
+                  └────────────┬────────────┘
+                               │
+                               ▼
+                  ┌─────────────────────────┐
+                  │  PRIORIDADES & ESTRATÉGIA│
+                  └────────────┬────────────┘
+                               │
+                               ▼
+                  ┌─────────────────────────┐
+                  │ CURSOS / MÓDULOS / TASKS│
+                  └────────────┬────────────┘
+                               │
+                               ▼
+                  ┌─────────────────────────┐
+                  │    FOCO & EXECUÇÃO      │
+                  │       Pomodoro          │
+                  └────────────┬────────────┘
+                               │
+                               ▼
+                  ┌─────────────────────────┐
+                  │  EVIDÊNCIAS & PROGRESSO │
+                  └────────────┬────────────┘
+                               │
+                               ▼
+                  ┌─────────────────────────┐
+                  │      EVOLUÇÃO & RPG     │
+                  └─────────────────────────┘
+O princípio central é:
+
+Planejamento só possui valor quando consegue produzir execução observável.
+
+🎯 Propósito do Projeto
+O Mentorii foi concebido com quatro objetivos principais:
+
+1. Transformar planejamento em execução
+Converter objetivos abstratos de carreira e estudo em estruturas operacionais:
+
+cursos;
+
+módulos;
+
+tarefas;
+
+hábitos;
+
+sessões de foco;
+
+prioridades;
+
+evidências de execução.
+
+2. Criar uma visão única do progresso
+Centralizar informações que normalmente ficam espalhadas entre aplicativos de tarefas, calendários, planilhas, anotações, plataformas de cursos e documentos de PDI.
+
+3. Utilizar gamificação de forma funcional
+Elementos de RPG, atributos, progresso e um mascote virtual transformam execução real em feedback visual conectado diretamente ao ganho de Focus Points (FP).
+
+4. Preservar autonomia e privacidade
+O sistema foi projetado para funcionar localmente, sem depender de infraestrutura de backend ou banco de dados em nuvem.
+
+🧠 Filosofia: Local-First
+A arquitetura prioriza o modelo Client-Side. Os dados permanecem no dispositivo do usuário através do localStorage, enquanto a aplicação executa sua lógica diretamente no navegador.
+
+Benefícios
+⚡ Resposta instantânea.
+
+🔒 Dados pessoais mantidos estritamente no dispositivo local.
+
+💰 Custo de infraestrutura zero.
+
+🌐 Funcionamento sem dependência de servidores dedicados.
+
+📦 Portabilidade total via exportação e importação manual de backups em JSON.
+
+Seus objetivos, seus dados, seu dispositivo.
+
+🏗️ Arquitetura
+A arquitetura do Mentorii separa claramente estado, regras, interface e persistência:
+
+Plaintext
+┌──────────────────────────────────────────────┐
+│                    UI                        │
+│ index.html / auth.html / componentes        │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│               CONTROLLER                     │
+│                 app.js                      │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│              MENTORII CORE                   │
+│ Estado • CRUD • RPG • Progresso • Persist.  │
+└───────────────┬──────────────────┬───────────┘
+                │                  │
+                ▼                  ▼
+       ┌────────────────┐  ┌──────────────────┐
+       │  localStorage  │  │  Renderização UI │
+       └────────────────┘  └──────────────────┘
+
+                       ▲
+                       │
+              ┌────────┴────────┐
+              │     Oracle      │
+              │ Regras / análise│
+              └─────────────────┘
+A base do sistema utiliza contratos de dados estruturados para gerenciar operações CRUD previsíveis, garantindo integridade e evitando inconsistências lógicas.
+
+📁 Estrutura do Projeto
+Plaintext
 mentorii/
 │
-├── 📄 auth.html          # Módulo de Autenticação, Cadastro e Isolamento de Perfis por Senha (PIN)
-├── 📄 index.html         # Cockpit Principal, Navegação por Abas e Modais de Configuração
-├── 📄 mentorii-core.js   # Core Engine: Gerenciador de Estado Reativo, CRUD LocalStorage e Sistema RPG
-├── 📄 oracle.js          # Motor Analítico: Parser Determinístico de PDI/Trello e Oráculo de Decisão
-├── 📄 style.css          # Design System customizado ('Pastel Tech') com suporte a temas e grade interativa
-└── 📄 README.md          # Documentação técnica e visão de portfólio do projeto
-
-🤖 Como este Sistema foi Desenvolvido com o Gemini
-Este projeto exemplifica a aplicação moderna de Desenvolvimento Orientado por IA (AI-Driven Development):
-
-Definição de Requisitos e UX: O escopo inicial foi desenhado definindo as necessidades de um estudante/profissional de alta performance.
-
-Engenharia de Prompt & Geração de Código: Através de conversas iterativas com o Gemini, estruturamos a lógica modular (separando o núcleo de dados da interface).
-
-Refinamento e Resolução de Erros: O Gemini atuou na depuração de comportamentos (como o tratamento de instâncias do Chart.js), na criação de parsers tolerantes a falhas para importação de JSONs variados, e no ajuste de regras de UI (como a grade curricular interativa por célula).
-
+├── 📄 auth.html          # Autenticação, isolamento de perfis e PIN de segurança
+├── 📄 index.html         # Cockpit principal, navegação por abas e modais
+├── 📄 mentorii-core.js   # Estado global, CRUD, persistência e mecânicas de RPG
+├── 📄 oracle.js          # Motor analítico, parser determinístico e oráculo
+├── 📄 style.css          # Design System customizado ('Pastel Tech')
+└── 📄 README.md          # Documentação oficial e portfólio
 ✨ Principais Funcionalidades
-🔒 Autenticação e Perfis Privados: Sistema de multi-usuários locais com isolamento de dados e proteção por senha.
+🎯 Foco & Pomodoro: Cockpit integrado com cronômetro, pausa e rastreamento de blocos de execução.
 
-📥 Importador Universal de PDI & Prompt Mestre: Mecanismo integrado capaz de ler arquivos .json, textos colados e oferecer um Prompt Mestre para que qualquer IA gere PDIs estruturados sob medida.
+★ Prioridades & Estratégia: Matriz de decisão operacional para classificar frentes ativas.
 
-🔮 Oráculo de Decisão & Métricas: Motor analítico que calcula a porcentagem real de prontidão com base na conclusão de módulos.
+📋 Diário de Progresso: Indicadores quantitativos e visuais da evolução global e por categoria.
 
-⏱️ Foco, Pomodoro & Floresta Virtual: Relógio integrado com suporte a pausa, personalização de atividades e plantio automático de árvores digitais (estilo Forest).
+📓 Notebook Técnico: Armazenamento de cadernos temáticos, anotações e evidências de desenvolvimento.
 
-🎓 Grade Curricular Interativa: Matriz semanal de horários com edição cirúrgica por célula.
+🐾 Mascote & RPG: Gamificação acoplada ao esforço real, onde o pet evolui conforme o progresso das metas.
 
-🐾 Mascote & Ecossistema RPG: Gamificação acoplada ao progresso real do PDI, onde o pet virtual evolui conforme as metas avançam.
+🌸 Hábitos & Agenda: Acompanhamento de consistência semanal e calendário de compromissos.
 
-🔮 Roadmap & Evolução Contínua
-O Mentorii é um projeto vivo. Ao longo do tempo, novas funcionalidades, melhorias arquiteturais e refinamentos de experiência de usuário serão desenvolvidos e integrados iterativamente, incluindo:
+📚 Cursos & Incubadora: Gestão estruturada de disciplinas ativas e zona de espera controlada para frentes secundárias.
 
-[ ] Auto-Save Inteligente (Debounce): Sincronização e salvamento em segundo plano sem necessidade de interações manuais.
+🤖 Desenvolvimento Assistido por IA (Transparência de Portfólio)
+O Mentorii serve também como uma demonstração prática de AI-Driven Development.
 
-[ ] Sistema de Toasts & Notificações Flutuantes: Avisos visuais elegantes substituindo os alertas nativos do navegador.
+O Papel da IA: Ferramentas de IA (como o Gemini) foram utilizadas como copilotos técnicos de alta performance para prototipagem rápida, estruturação de componentes, revisão de código e auxílio na depuração de comportamentos assíncronos.
 
-[ ] Integração Profunda Tamagotchi + Floresta: Expansão do mundo do pet com recompensas obtidas através das árvores cultivadas no modo foco.
+O Papel do Desenvolvedor: A concepção do produto, a modelagem da arquitetura Local-First, a tomada de decisões de UX, a curadoria e o refinamento linha a linha do código-fonte foram integralmente conduzidos pelo autor do projeto.
 
-[ ] Exportação Avançada de Relatórios: Geração de resumos em PDF/Markdown do progresso acadêmico e profissional.
+Esta abordagem evidencia a maturidade de utilizar tecnologias modernas de IA para maximizar a produtividade e a velocidade de entrega sem abrir mão do rigor técnico e do entendimento profundo do software construído.
 
-🛠️ Tecnologias Utilizadas
-HTML5 & CSS3 (Pastel Tech Design System).
+🎨 Design System — Pastel Tech
+A identidade visual prioriza uma estética limpa, com contraste suave e foco na leitura analítica:
 
-JavaScript (ES6+ Modular) para gerenciamento de estado e reatividade.
+Paleta: Tons pastéis com destaque em roxo/lavanda (#9D7BB0), verde sálvia (#82B39A), rosa (#E287A8) e laranja (#E6A15C).
 
-Chart.js para visualização analítica de produtividade.
+Tipografia: IBM Plex Sans para textos e interfaces, e JetBrains Mono para métricas, códigos e cronômetros.
 
-Local Storage API para persistência de dados local orientada à privacidade.
+🛠️ Tecnologias
+Tecnologia	Função
+HTML5 & CSS3	Estrutura e Design System Pastel Tech
+JavaScript ES6+	Lógica e Gestão de Estado Modular
+Chart.js	Visualização analítica de dados
+LocalStorage API	Persistência local Client-Side
+JSON	Contratos de dados e portabilidade de backup
+🗺️ Roadmap de Evolução
+[x] Fundação: Arquitetura Local-First, CRUD local, RPG e Pomodoro.
 
----
+[ ] Próxima Evolução: Auto-save inteligente (debounce), sistema de Toasts e melhorias no feedback visual.
 
-### 📦 Salvando a Atualização no GitHub
-Para atualizar o seu repositório com este README completo, rode no seu terminal:
-```bash
-git add README.md
-git commit -m "docs: atualizando README com secao de roadmap e evolucao continua do projeto"
-git push origin main
+[ ] Expansão: Relatórios de progresso avançados e exportação de dados em formatos dedicados.
+
+[ ] Futuro (Versão Cloud): Sincronização multi-device opcional, backup automático e inteligência preditiva.
+
+💻 Como Executar Localmente
+Clone o repositório:
+
+Bash
+git clone https://github.com/deborac8/mentorii.git
+Entre na pasta:
+
+Bash
+cd mentorii
+Abra o arquivo auth.html em qualquer navegador moderno.
