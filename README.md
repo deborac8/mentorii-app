@@ -1,5 +1,3 @@
-Aqui está o texto que você enviou, devidamente editado e formatado em Markdown puro e rigoroso (com títulos corretos, listas formatadas, blocos de código ajustados, tabelas estruturadas e sem blocos soltos), indo até a seção de execução local:
-
 🚀 Mentorii — Career Operating System
 Mentorii é um sistema operacional de carreira e estudos (Career OS) desenvolvido no modelo Local-First, projetado para transformar planos de desenvolvimento individual (PDI), estudos, rotina de foco e produtividade em um sistema único de execução e acompanhamento.
 
