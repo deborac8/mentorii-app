@@ -1,456 +1,293 @@
 /* ============================================================ */
-/* SEÇÃO 1: DESIGN SYSTEM & VARIÁVEIS DE TEMAS                  */
-/* Define as paletas de cores, fontes, sombras e bordas do app. */
+/* MENTORII — PASTEL TECH DESIGN SYSTEM                         */
 /* ============================================================ */
 
-/* TEMA 1: SOFT PASTEL / CLEAN GIRL (Identidade Reestilizada Suave & Aconchegante) */
-:root, [data-theme="pastel"] {
-    --bg-main: #fbf8fe;
-    --bg-card: #ffffff;
-    --bg-subtle: #f5eefc;
-    --border: #ebdcf8;
-    --border-light: #f4eafe;
+:root {
+    --bg-page: #F8F9FA;
+    --bg-panel: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-subtle: #F1F3F5;
+    --border: #E9ECEF;
+    --border-light: #F1F3F5;
     
-    --text: #2c2238;
-    --text-dim: #79688e;
+    --text: #212529;
+    --text-dim: #868E96;
     
-    --purple: #9061f9;
-    --purple-light: #f0e7ff;
-    --salvia: #10b981;
-    --salvia-light: #d1fae5;
-    --amber: #f59e0b;
-    --amber-light: #fef3c7;
-    --pink: #f472b6;
-    --pink-light: #fce7f3;
-    --red: #ef4444;
-    --red-light: #fee2e2;
+    /* PALETA PASTEL TECH */
+    --purple: #9D7BB0;
+    --purple-light: #F3EDF7;
+    --pink: #E287A8;
+    --pink-light: #FDF0F5;
+    --salvia: #82B39A;
+    --salvia-light: #EDF7F2;
+    --amber: #E6A15C;
+    --amber-light: #FDF5ED;
+    --red: #E03131;
 
-    --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-main: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --mono: 'JetBrains Mono', monospace;
 
-    --radius-sm: 10px;
-    --radius-md: 14px;
-    --radius-lg: 18px;
-    
-    --shadow-sm: 0 2px 6px rgba(144, 97, 249, 0.06);
-    --shadow-md: 0 6px 18px rgba(144, 97, 249, 0.10);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
 }
 
-/* TEMA 2: DARK MODE / CYBER HUD */
-[data-theme="dark"] {
-    --bg-main: #121118;
-    --bg-card: #1c1a24;
-    --bg-subtle: #272433;
-    --border: #363247;
-    --border-light: #2d2a3b;
-    
-    --text: #f1edfa;
-    --text-dim: #a097b3;
-    
-    --purple: #a78bfa;
-    --purple-light: #2e2640;
-    --salvia: #34d399;
-    --salvia-light: #16382c;
-    --amber: #fbbf24;
-    --amber-light: #3d3118;
-    --pink: #f472b6;
-    --pink-light: #3e1f30;
-    --red: #f87171;
-    --red-light: #3d1b1b;
-
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-/* TEMA 3: SÁLVIA MINIMALISTA */
-[data-theme="salvia"] {
-    --bg-main: #f4f7f5;
-    --bg-card: #ffffff;
-    --bg-subtle: #e6ede8;
-    --border: #cdded3;
-    --border-light: #e1ebe4;
-    
-    --text: #1d2e25;
-    --text-dim: #5c7366;
-    
-    --purple: #059669;
-    --purple-light: #d1fae5;
-    --salvia: #0d9488;
-    --salvia-light: #ccfbf1;
-    --amber: #d97706;
-    --amber-light: #fef3c7;
-    --pink: #e11d48;
-    --pink-light: #ffe4e6;
-    --red: #dc2626;
-    --red-light: #fee2e2;
-}
-
-/* TEMA 4: SLATE / MONOCHROME TECH */
-[data-theme="slate"] {
-    --bg-main: #f8fafc;
-    --bg-card: #ffffff;
-    --bg-subtle: #f1f5f9;
-    --border: #cbd5e1;
-    --border-light: #e2e8f0;
-    
-    --text: #0f172a;
-    --text-dim: #64748b;
-    
-    --purple: #2563eb;
-    --purple-light: #dbeafe;
-    --salvia: #0284c7;
-    --salvia-light: #e0f2fe;
-    --amber: #ea580c;
-    --amber-light: #ffedd5;
-    --pink: #7c3aed;
-    --pink-light: #ede9fe;
-    --red: #e11d48;
-    --red-light: #ffe4e6;
-}
-
-/* ============================================================ */
-/* SEÇÃO 2: RESET GLOBAL & BASE DE ESTILOS                      */
-/* Padroniza box-sizing, margens e comportamento de fontes.      */
-/* ============================================================ */
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 body {
-    background-color: var(--bg-main);
+    background-color: var(--bg-page);
     color: var(--text);
-    font-family: var(--font-sans);
+    font-family: var(--font-main);
     line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-/* Contêiner principal do Cockpit que centraliza o conteúdo */
-.app {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* ============================================================ */
-/* SEÇÃO 3: TOPBAR & CABEÇALHO DO USUÁRIO                       */
-/* Layout flexível com informações de perfil e ações gerais.    */
-/* ============================================================ */
-.topbar {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
     padding: 24px;
+}
+
+.app {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+/* TOPBAR */
+.topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
-    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
 }
 
 .eyebrow {
     font-family: var(--mono);
     font-size: 11px;
     font-weight: 700;
-    color: var(--purple);
-    letter-spacing: 0.08em;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--purple);
     margin-bottom: 4px;
 }
 
-.topbar h1 {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1.2;
+h1 {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
 .topbar-description {
     font-size: 13px;
     color: var(--text-dim);
-    margin-top: 4px;
 }
 
 .header-actions {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
-/* ============================================================ */
-/* SEÇÃO 4: BOTÕES DE AÇÃO & BACKUP                             */
-/* Estilos padronizados de botões primários e secundários.       */
-/* ============================================================ */
-.btn-action {
-    background-color: var(--purple);
-    color: #ffffff;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 10px 16px;
-    font-family: var(--font-sans);
-    font-size: 13px;
+/* BUTTONS */
+button {
+    font-family: var(--mono);
+    font-size: 11.5px;
     font-weight: 600;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-action {
+    background: var(--purple);
+    color: #FFFFFF;
 }
 
 .btn-action:hover {
-    filter: brightness(1.08);
+    filter: brightness(0.92);
 }
 
 .btn-backup {
-    background-color: var(--bg-subtle);
+    background: var(--bg-subtle);
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 9px 14px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
 }
 
 .btn-backup:hover {
-    background-color: var(--border-light);
+    background: #E9ECEF;
 }
 
-.btn-icon-help {
-    background-color: var(--purple-light);
-    color: var(--purple);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    width: 38px;
-    height: 38px;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+.btn-reset {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid rgba(224, 49, 49, 0.2);
 }
 
-.btn-icon-help:hover {
-    background-color: var(--purple);
-    color: #ffffff;
+.btn-reset:hover {
+    background: #FFF5F5;
 }
 
-/* ============================================================ */
-/* SEÇÃO 5: BARRA DE PROGRESSO MACRO & STREAK                  */
-/* Indicador visual de meta acumulada e dias ativos em sequência.*/
-/* ============================================================ */
+.btn-add {
+    background: var(--salvia);
+    color: #FFFFFF;
+}
+
+/* GLOBAL PROGRESS BAR */
 .global-progress-box {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 16px 20px;
     display: flex;
     align-items: center;
     gap: 16px;
-    box-shadow: var(--shadow-sm);
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
 }
 
 .global-progress-info {
     font-family: var(--mono);
     font-size: 12px;
     font-weight: 700;
-    color: var(--text);
     white-space: nowrap;
 }
 
 .global-progress-bar-bg {
     flex: 1;
-    height: 10px;
-    background-color: var(--bg-subtle);
-    border-radius: 20px;
+    height: 8px;
+    background: var(--bg-subtle);
+    border-radius: 4px;
     overflow: hidden;
 }
 
 .global-progress-bar-fill {
     height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, var(--purple) 0%, var(--pink) 100%);
-    border-radius: 20px;
+    background: var(--purple);
+    border-radius: 4px;
     transition: width 0.4s ease;
 }
 
 .streak-badge {
-    background-color: var(--amber-light);
-    color: var(--amber);
-    border: 1px solid var(--amber);
-    border-radius: 20px;
-    padding: 4px 12px;
     font-family: var(--mono);
     font-size: 11px;
     font-weight: 700;
+    background: var(--pink-light);
+    color: var(--pink);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(226, 135, 168, 0.3);
     white-space: nowrap;
 }
 
-/* ============================================================ */
-/* SEÇÃO 6: NAVEGAÇÃO DE ABAS RESPONSIVA & INTERATIVA           */
-/* Em tela cheia: visibilidade total em wrap.                    */
-/* Em telas menores: scroll horizontal suave.                   */
-/* ============================================================ */
+/* TABS NAVIGATION */
 .nav-tabs {
     display: flex;
-    flex-wrap: wrap; /* Em tela cheia mostra todas as abas sem esconder */
-    gap: 8px;
-    padding-bottom: 6px;
-}
-
-/* Em telas menores que 900px, habilita a rolagem horizontal */
-@media (max-width: 900px) {
-    .nav-tabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        scrollbar-width: thin;
-    }
-
-    .nav-tabs::-webkit-scrollbar {
-        height: 4px;
-    }
-
-    .nav-tabs::-webkit-scrollbar-thumb {
-        background-color: var(--border);
-        border-radius: 4px;
-    }
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .tab-btn {
-    background-color: var(--bg-card);
+    background: var(--bg-panel);
     color: var(--text-dim);
     border: 1px solid var(--border);
+    padding: 8px 14px;
     border-radius: var(--radius-sm);
-    padding: 10px 16px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-    cursor: pointer !important; /* Garante o cursor clicável */
-    user-select: none;
-    transition: all 0.2s ease;
+    font-size: 11.5px;
 }
 
 .tab-btn:hover {
-    color: var(--purple);
-    border-color: var(--purple);
-    background-color: var(--purple-light);
-    transform: translateY(-1px);
+    color: var(--text);
+    border-color: #CED4DA;
 }
 
 .tab-btn.active {
-    background-color: var(--purple);
-    color: #ffffff;
+    background: var(--purple);
+    color: #FFFFFF;
     border-color: var(--purple);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .tab-btn.tab-backlog {
     border-style: dashed;
 }
 
-/* ============================================================ */
-/* SEÇÃO 7: CONTÊINER DE ABAS & ESTRUTURA DE CARDS              */
-/* Exibição condicional de abas e componentes base de cartão.   */
-/* ============================================================ */
+/* SECTIONS / TABS */
 .tab-content {
     display: none;
-    flex-direction: column;
-    gap: 18px;
 }
 
 .tab-content.active {
-    display: flex;
+    display: block;
 }
 
+/* CARDS */
 .card {
-    background-color: var(--bg-card);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
+    padding: 18px;
+    margin-bottom: 16px;
 }
 
 .card-purple-border {
-    border-left: 4px solid var(--purple);
+    border-color: rgba(157, 123, 176, 0.4);
 }
 
 .card-pink-border {
-    border-left: 4px solid var(--pink);
+    border-color: rgba(226, 135, 168, 0.4);
 }
 
 .card-purple-gradient {
-    background: linear-gradient(135deg, var(--bg-card) 0%, var(--purple-light) 100%);
-    border: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--purple-light) 0%, #FFFFFF 100%);
+    border-color: var(--purple);
 }
 
-.flex-between {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+.card-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    margin-bottom: 12px;
 }
 
-.mt-14 { margin-top: 14px; }
-.mt-16 { margin-top: 16px; }
-.mb-16 { margin-bottom: 16px; }
-
-/* ============================================================ */
-/* SEÇÃO 8: ORÁCULO DE IA (DIAGNÓSTICO E RECOMENDAÇÃO)          */
-/* Card superior com destaque visual para orientações da IA.    */
-/* ============================================================ */
+/* ORACLE CARD */
 .oracle-card {
-    background-color: var(--purple-light);
-    border: 1px solid var(--border);
+    background: var(--salvia-light);
+    border: 1px solid rgba(130, 179, 154, 0.5);
     border-radius: var(--radius-md);
-    padding: 16px 20px;
-}
-
-.oracle-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    padding: 14px 18px;
+    margin-bottom: 18px;
 }
 
 .oracle-title {
     font-family: var(--mono);
     font-size: 12px;
     font-weight: 700;
-    color: var(--purple);
-    text-transform: uppercase;
+    color: var(--salvia);
 }
 
 .oracle-recommendation {
-    font-size: 13.5px;
-    color: var(--text);
-    font-weight: 500;
+    font-size: 12.5px;
+    margin-top: 6px;
+    color: #2B593F;
 }
 
-/* ============================================================ */
-/* SEÇÃO 9: CARD DE FOCO DO MOMENTO & RELÓGIO POMODORO          */
-/* Grid dividido entre a tarefa ativa e o temporizador de foco.  */
-/* ============================================================ */
+/* DAILY FOCUS & POMODORO */
 .daily-focus-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 24px;
     display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 24px;
-    align-items: center;
-    box-shadow: var(--shadow-sm);
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    background: var(--bg-panel);
+    border: 1px solid rgba(157, 123, 176, 0.4);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 18px;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 768px) {
     .daily-focus-card {
         grid-template-columns: 1fr;
     }
@@ -459,119 +296,100 @@ body {
 .daily-focus-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
 .daily-focus-tag {
-    background-color: var(--purple-light);
-    color: var(--purple);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    padding: 4px 8px;
-    border-radius: var(--radius-sm);
+    background: var(--purple-light);
+    color: var(--purple);
+    padding: 3px 8px;
+    border-radius: 4px;
 }
 
 .category-tag {
-    background-color: var(--bg-subtle);
-    color: var(--text-dim);
     font-family: var(--mono);
-    font-size: 11px;
-    padding: 4px 8px;
-    border-radius: var(--radius-sm);
+    font-size: 10px;
+    color: var(--text-dim);
 }
 
 .daily-focus-task {
-    font-size: 18px;
+    font-family: var(--mono);
+    font-size: 15px;
     font-weight: 700;
-    color: var(--text);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .daily-focus-actions {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
 }
 
 .btn-complete-task {
-    background-color: var(--salvia);
-    color: #ffffff;
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 9px 16px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.btn-complete-task:hover {
-    filter: brightness(1.08);
+    background: var(--salvia);
+    color: #FFFFFF;
 }
 
 .btn-skip-task {
-    background-color: var(--bg-subtle);
+    background: var(--bg-subtle);
     color: var(--text-dim);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 9px 14px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    cursor: pointer;
 }
 
-/* BOX DO POMODORO & SEQUÊNCIA DE SPRINTS */
+/* POMODORO */
 .pomodoro-box {
-    background-color: var(--bg-subtle);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 18px;
+    background: var(--bg-subtle);
+    border-radius: var(--radius-sm);
+    padding: 12px;
     text-align: center;
 }
 
 .pomodoro-title {
     font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 10.5px;
     color: var(--text-dim);
+    font-weight: 700;
     text-transform: uppercase;
-    margin-bottom: 8px;
 }
 
 .pomodoro-display {
     font-family: var(--mono);
-    font-size: 42px;
+    font-size: 32px;
     font-weight: 800;
+    color: var(--text);
+    margin: 4px 0;
+}
+
+.pomodoro-cycles {
+    font-family: var(--mono);
+    font-size: 10px;
     color: var(--purple);
-    line-height: 1;
-    margin: 6px 0;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.pomodoro-btns {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
 }
 
 .btn-pomo {
-    background-color: var(--bg-card);
-    color: var(--text);
+    background: var(--bg-panel);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 6px 10px;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
+    font-size: 10.5px;
+    padding: 5px 10px;
 }
 
-.btn-pomo:hover {
-    border-color: var(--purple);
-    color: var(--purple);
-}
-
-/* SPRINT SEMANAL */
+/* SPRINTS */
 .sprint-box {
-    background-color: var(--bg-card);
+    background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 16px;
+    margin-bottom: 18px;
 }
 
 .sprint-header {
@@ -581,46 +399,85 @@ body {
     margin-bottom: 12px;
 }
 
-.section-subtitle {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-}
-
-.btn-add {
-    background-color: var(--purple-light);
-    color: var(--purple);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 6px 12px;
-    font-family: var(--font-sans);
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
 .sprint-list {
     list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
 }
 
-/* ============================================================ */
-/* SEÇÃO 10: ABA 2 — PRIORIDADES & HERO CARD                    */
-/* Layout do Alvo de Estudo e display do Nível de Prontidão %.  */
-/* ============================================================ */
-.priority-hero {
+/* 3 FOCUS FRENTS */
+.priority-grid {
     display: grid;
-    grid-template-columns: 1fr 260px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.priority-card {
+    border-left: 4px solid var(--purple);
+    margin-bottom: 0;
+}
+
+.priority-card.primary {
+    border-left-color: var(--salvia);
+}
+
+.priority-card.secondary {
+    border-left-color: var(--purple);
+}
+
+.priority-card.support {
+    border-left-color: var(--amber);
+}
+
+.priority-card .rank {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.priority-card h3 {
+    font-size: 14px;
+    font-family: var(--mono);
+    font-weight: 700;
+}
+
+/* COURSES & ACCORDIONS */
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 16px;
 }
 
-@media (max-width: 768px) {
+.course-card {
+    margin-bottom: 0;
+}
+
+.course-card-title {
+    font-family: var(--mono);
+    font-size: 13.5px;
+}
+
+/* MATRIZ DE PRIORIDADES & HERO */
+.priority-hero {
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 600px) {
     .priority-hero {
         grid-template-columns: 1fr;
     }
+}
+
+.priority-score-inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
 }
 
 .priority-label {
@@ -628,83 +485,237 @@ body {
     font-size: 11px;
     font-weight: 700;
     color: var(--purple);
-    letter-spacing: 0.05em;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
 }
 
-.priority-score {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* HABIT TABLE & MATRICES */
+.habit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-family: var(--mono);
     text-align: center;
-    background: linear-gradient(135deg, var(--bg-card) 0%, var(--purple-light) 100%);
 }
 
-.priority-score-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.habit-table th {
+    padding: 10px;
+    background: var(--bg-subtle);
+    color: var(--purple);
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
 }
 
-/* ============================================================ */
-/* SEÇÃO 11: ABA 3 — DIÁRIO DE PROGRESSO & ANEL SVG             */
-/* Estilização do resumo com anel SVG e lista de tarefas.       */
-/* ============================================================ */
-.diary-summary {
+.habit-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.habit-table .text-left {
+    text-align: left;
+}
+
+/* TAMAGOTCHI WORLD */
+.mentorii-world-container {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    text-align: center;
+}
+
+.pet-speech-bubble {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+.pet-status {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 16px;
+}
+
+.rpg-stats-grid {
     display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.rpg-stat-card {
+    background: var(--bg-subtle);
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.attr-val {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--purple);
+}
+
+.attr-lbl {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+}
+
+/* CALENDAR & JOURNAL */
+.calendar-box {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.calendar-header-nav {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    font-family: var(--mono);
+    font-weight: 700;
+    margin-bottom: 14px;
 }
 
-@media (max-width: 700px) {
-    .diary-summary {
-        grid-template-columns: 1fr;
-    }
+.btn-cal-nav {
+    background: var(--bg-subtle);
+    color: var(--text);
+    padding: 5px 10px;
 }
 
-.ring-wrap {
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    text-align: center;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.diary-groups {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* ============================================================ */
-/* SEÇÃO 12: ENTRADAS DE FORMULÁRIO (INPUTS & SELECTS)          */
-/* Padronização dos campos para adicionar exercícios e tarefas. */
-/* ============================================================ */
-.input-text {
-    background-color: var(--bg-main);
-    color: var(--text);
-    border: 1px solid var(--border);
+    background: var(--bg-subtle);
     border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    outline: none;
-}
-
-.input-text:focus {
-    border-color: var(--purple);
-}
-
-.select-priority, .select-category {
-    background-color: var(--bg-main);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 8px 12px;
-    font-family: var(--font-sans);
-    font-size: 13px;
-    outline: none;
+    font-family: var(--mono);
+    font-size: 12px;
     cursor: pointer;
+    position: relative;
+}
+
+.calendar-day:hover {
+    background: #E9ECEF;
+}
+
+.calendar-day.today {
+    border: 2px solid var(--pink);
+    font-weight: bold;
+}
+
+.calendar-day.selected {
+    background: var(--purple);
+    color: #FFFFFF;
+}
+
+.calendar-day-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--pink);
+    border-radius: 50%;
+    margin-top: 2px;
+}
+
+/* CHARTS GRID */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.chart-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.chart-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* UTILS */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-subtitle {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: var(--purple-light);
+    color: var(--purple);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.priority-badge-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-p-high {
+    background: #FFE3E3;
+    color: #C92A2A;
+}
+
+.badge-p-mid {
+    background: var(--amber-light);
+    color: #D9480F;
+}
+
+.badge-p-low {
+    background: var(--salvia-light);
+    color: #2B8A3E;
+}
+
+.input-text, .input-date, .input-time, .select-priority {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-panel);
+    color: var(--text);
 }
 
 .add-task-form {
@@ -714,257 +725,26 @@ body {
     align-items: center;
 }
 
+.add-task-form .input-text {
+    flex: 1;
+    min-width: 180px;
+}
+
 .max-w-120 {
     max-width: 120px;
 }
 
-/* ============================================================ */
-/* SEÇÃO 13: ABA 5 — MENTORII RPG & MASCOTE VIVO                */
-/* Avatar dinâmico, balão de fala e grid dos atributos do RPG.  */
-/* ============================================================ */
-.mentorii-world-container {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-}
+.mt-14 { margin-top: 14px; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
 
-.pet-speech-bubble {
-    background-color: var(--bg-subtle);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    padding: 12px 16px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text);
-    position: relative;
-    box-shadow: var(--shadow-sm);
-}
-
-.rpg-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 10px;
-}
-
-.rpg-stat-card {
-    background-color: var(--bg-main);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px 8px;
-    text-align: center;
-}
-
-.attr-val {
-    font-family: var(--mono);
-    font-size: 20px;
-    font-weight: 800;
-}
-
-.attr-lbl {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 2px;
-}
-
-/* ============================================================ */
-/* SEÇÃO 14: ABA 6 — TABELA DE HÁBITOS & CONSISTÊNCIA           */
-/* Tabela semanal com checkboxes e indicadores visuais.          */
-/* ============================================================ */
-.habit-tracker-container {
-    overflow-x: auto;
-}
-
-.habit-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--mono);
-    font-size: 12px;
-}
-
-.habit-table th {
-    padding: 10px;
-    color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
-    font-weight: 700;
-}
-
-.habit-table td {
-    padding: 12px 8px;
-    border-bottom: 1px solid var(--border-light);
-    text-align: center;
-}
-
-.habit-table td.text-left {
-    text-align: left;
-    font-weight: 600;
-    color: var(--text);
-}
-
-.habit-checkbox {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--purple);
-    cursor: pointer;
-}
-
-/* ============================================================ */
-/* SEÇÃO 15: ABA 7 — GRÁFICOS & ANALYTICS                       */
-/* Grid para posicionar os gráficos do Chart.js lado a lado.     */
-/* ============================================================ */
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 16px;
-}
-
-.chart-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 18px;
-}
-
-/* ============================================================ */
-/* SEÇÃO 16: ABA 8 & 9 — GRADE DE DISCIPLINAS & INCUBADORA       */
-/* Grid dinâmico de cards de matérias (sem limite de quantidade).*/
-/* ============================================================ */
-.course-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-}
-
-.course-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: var(--shadow-sm);
-}
-
-.course-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-}
-
-.course-card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-}
-
-/* ============================================================ */
-/* SEÇÃO 17: ABA 10 — CALENDÁRIO & AGENDA MENSAL                */
-/* Grade de 7 colunas para os dias do mês e compromissos.       */
-/* ============================================================ */
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-top: 10px;
-}
-
-.calendar-day-cell {
-    background-color: var(--bg-main);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    min-height: 52px;
-    padding: 6px;
-    font-family: var(--mono);
-    font-size: 11px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    cursor: pointer;
-}
-
-.calendar-day-cell:hover {
-    border-color: var(--purple);
-}
-
-.calendar-day-cell.today {
-    background-color: var(--purple-light);
-    border-color: var(--purple);
-    font-weight: 800;
-}
-
-.calendar-event-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--purple);
-    display: inline-block;
-}
-
-/* ============================================================ */
-/* SEÇÃO 18: MODAIS FLUTUANTES (ONBOARDING & AJUDA)             */
-/* Fundo escuro translúcido e caixa centralizada na tela.       */
-/* ============================================================ */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(15, 12, 22, 0.65);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-.modal-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 24px;
-    width: 100%;
-    max-width: 520px;
-    box-shadow: var(--shadow-md);
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-card h3 {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-    margin: 4px 0 8px 0;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-/* ============================================================ */
-/* SEÇÃO 19: RODAPÉ FIXO DO APLICATIVO                          */
-/* ============================================================ */
 footer {
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
-    margin-top: 10px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--text-dim);
-}
-
-@media (max-width: 600px) {
-    footer {
-        flex-direction: column;
-        gap: 6px;
-        text-align: center;
-    }
+    margin-top: 30px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
 }
