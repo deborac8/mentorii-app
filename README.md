@@ -18,9 +18,10 @@
 
 ## 💡 Origem & Filosofia de Construção
 
-O **Mentorii** nasceu de uma necessidade prática de organização pessoal: criar uma ferramenta sob medida para centralizar a própria rotina de estudos, planejamento e execução de carreira. 
+O **Mentorii** nasceu de uma necessidade prática de organização pessoal: criar uma ferramenta sob medida para centralizar a própria rotina de estudos, planejamento e execução de carreira.
 
 O projeto foi construído de forma modular e iterativa, moldado passo a passo a partir de necessidades reais e de testes contínuos:
+
 * **Evolução Baseada em Testes:** Cada nova atualização passou por ciclos de validação de uso, corrigindo falhas de interface, otimizando o fluxo de dados e eliminando complexidades desnecessárias.
 * **Critério e Ética no Desenvolvimento:** A escolha das funcionalidades e da arquitetura priorizou a autonomia, a clareza e a utilidade real do produto, mantendo uma postura transparente sobre os limites e as potencialidades de ferramentas digitais e assistidas por IA.
 
@@ -37,7 +38,7 @@ O Mentorii não pretende ser apenas mais um gerenciador de tarefas. A proposta �
                                │
                                ▼
                   ┌─────────────────────────┐
-                  │  PRIORIDADES & ESTRATÉGIA│
+                  │ PRIORIDADES & ESTRATÉGIA│
                   └────────────┬────────────┘
                                │
                                ▼
@@ -60,32 +61,44 @@ O Mentorii não pretende ser apenas mais um gerenciador de tarefas. A proposta �
                   ┌─────────────────────────┐
                   │      EVOLUÇÃO & RPG     │
                   └─────────────────────────┘
+```
 
-Princípio Central: Planejamento só possui valor quando consegue produzir execução observável.
+> **Princípio Central:** *Planejamento só possui valor quando consegue produzir execução observável.*
 
-🎯 Propósito do Projeto
-Transformar planejamento em execução: Converter objetivos abstratos de carreira e estudo em cursos, módulos, tarefas, hábitos, sessões de foco e evidências.
+---
 
-Criar uma visão única do progresso: Centralizar informações que normalmente ficam espalhadas entre aplicativos, planilhas e calendários.
+## 🎯 Propósito do Projeto
 
-Utilizar gamificação funcional: Elementos de RPG e um mascote virtual transformam esforço real em feedback visual (Focus Points - FP).
+O Mentorii foi concebido com quatro objetivos principais:
 
-Preservar autonomia e privacidade: Arquitetura sem dependência de infraestrutura em nuvem ou banco de dados externo.
+1. **Transformar planejamento em execução:** Converter objetivos abstratos de carreira e estudo em cursos, módulos, tarefas, hábitos, sessões de foco e evidências de execução.
+2. **Criar uma visão única do progresso:** Centralizar informações que normalmente ficam espalhadas entre aplicativos de tarefas, calendários, planilhas, anotações, plataformas de cursos e documentos de PDI.
+3. **Utilizar gamificação funcional:** Elementos de RPG, atributos dinâmicos e um mascote virtual transformam o esforço de estudo em feedback visual (`Focus Points - FP`).
+4. **Preservar autonomia e privacidade:** Arquitetura sem dependência de infraestrutura em nuvem, servidor backend ou banco de dados externo.
 
-🧠 Filosofia: Local-First
-A aplicação prioriza o modelo Client-Side. Os dados permanecem estritamente no dispositivo do usuário através do localStorage.
+---
 
-⚡ Resposta instantânea: Zero latência de rede.
+## 🧠 Filosofia: Local-First
 
-🔒 Privacidade total: Seus dados nunca saem do seu navegador.
+A aplicação prioriza o modelo **Client-Side**. Os dados permanecem estritamente no dispositivo do usuário através do `localStorage`, enquanto a aplicação executa sua lógica diretamente no navegador.
 
-💰 Custo zero: Infraestrutura totalmente estática.
+### Benefícios
 
-📦 Portabilidade: Exportação e importação completa via arquivos JSON.
+* ⚡ **Resposta instantânea:** Zero latência de rede.
+* 🔒 **Privacidade total:** Seus dados pessoais nunca saem do seu navegador.
+* 💰 **Custo zero:** Infraestrutura totalmente estática.
+* 🌐 **Funcionamento autônomo:** Roda sem backend dedicado.
+* 📦 **Portabilidade:** Exportação e importação completa via arquivos JSON.
 
-🏗️ Arquitetura & Estrutura
-O sistema separa claramente estado, regras, interface e persistência:
+> *Seus objetivos, seus dados, seu dispositivo.*
 
+---
+
+## 🏗️ Arquitetura & Estrutura
+
+O sistema separa claramente **estado, regras, interface e persistência**:
+
+```text
 ┌──────────────────────────────────────────────┐
 │                    UI                        │
 │ index.html / auth.html / componentes        │
@@ -94,7 +107,7 @@ O sistema separa claramente estado, regras, interface e persistência:
                        ▼
 ┌──────────────────────────────────────────────┐
 │               CONTROLLER                     │
-│                 app.js                      │
+│                  app.js                      │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -114,9 +127,11 @@ O sistema separa claramente estado, regras, interface e persistência:
               │     Oracle      │
               │ Regras / análise│
               └─────────────────┘
+```
 
-📁 Organização de Pastas
+### 📁 Organização de Pastas
 
+```text
 mentorii/
 ├── 📄 auth.html          # Autenticação, isolamento de perfis e PIN de segurança
 ├── 📄 index.html         # Cockpit principal, navegação por abas e modais
@@ -124,47 +139,82 @@ mentorii/
 ├── 📄 oracle.js          # Motor analítico, parser determinístico e oráculo
 ├── 📄 style.css          # Design System customizado ('Pastel Tech')
 └── 📄 README.md          # Documentação oficial e portfólio
+```
 
-✨ Principais Funcionalidades
+---
 
-🎯 Foco & Pomodoro: Cockpit integrado com cronômetro, pausa e rastreamento de blocos de execução.
+## ✨ Principais Funcionalidades
 
-★ Prioridades & Estratégia: Matriz de decisão operacional para classificar frentes ativas.
+* **🎯 Foco, Pomodoro & Bosque:** Cockpit integrado com cronômetro, pausa e plantio automático de árvores digitais a cada ciclo concluído.
+* **★ Prioridades & Estratégia:** Matriz de decisão operacional para classificar frentes ativas.
+* **📋 Diário de Progresso:** Indicadores quantitativos e visuais da evolução global e por categoria.
+* **📓 Notebook Técnico:** Armazenamento de cadernos temáticos, anotações e evidências de desenvolvimento.
+* **🐾 Mascote & RPG:** Sistema de evolução com mascote virtual acoplado ao esforço real de conclusão de metas.
+* **🌸 Hábitos & Agenda:** Acompanhamento de consistência semanal e calendário de compromissos.
+* **📚 Cursos & Incubadora:** Gestão estruturada de disciplinas ativas e zona de espera controlada.
 
-📋 Diário de Progresso: Indicadores quantitativos e visuais da evolução global e por categoria.
+---
 
-📓 Notebook Técnico: Armazenamento de cadernos temáticos, anotações e evidências de desenvolvimento.
+## 🤖 Desenvolvimento Assistido por IA
 
-🐾 Mascote & RPG: Gamificação acoplada ao esforço real, onde o pet evolui conforme o progresso das metas.
+O Mentorii serve como uma demonstração prática de **AI-Driven Development**.
 
-🌸 Hábitos & Agenda: Acompanhamento de consistência semanal e calendário de compromissos.
+* **O Papel da IA:** Ferramentas como o *Gemini* atuaram como copilotos de alta performance para prototipagem rápida, estruturação de componentes, revisão de código e auxílio na depuração.
+* **O Papel do Desenvolvedor:** A concepção do produto, modelagem arquitetural (*Local-First*), decisões de UX e curadoria linha a linha foram integralmente conduzidas pelo autor do projeto.
 
-📚 Cursos & Incubadora: Gestão estruturada de disciplinas ativas e zona de espera controlada.
+---
 
-🤖 Desenvolvimento Assistido por IA (Transparência)
-O Mentorii serve como uma demonstração prática de AI-Driven Development:
+## 🎨 Design System & Tecnologias
 
-O Papel da IA: Ferramentas como o Gemini atuaram como copilotos de alta performance para prototipagem rápida, estruturação de componentes, revisão de código e auxílio na depuração.
+* **Estética:** *Pastel Tech*, com tons suaves e foco analítico em:
 
-O Papel do Desenvolvedor: A concepção do produto, modelagem arquitetural (Local-First), decisões de UX e curadoria linha a linha foram integralmente conduzidas pelo autor do projeto.
+  * Roxo `#9D7BB0`
+  * Verde sálvia `#82B39A`
+  * Rosa `#E287A8`
+* **Tipografia:** `IBM Plex Sans` para interface e `JetBrains Mono` para métricas e dados.
 
-🎨 Design System & TecnologiasEstética: Pastel Tech (tons suaves com foco analítico em roxo #9D7BB0, verde sálvia #82B39A e rosa #E287A8).Tipografia: IBM Plex Sans (interface) e JetBrains Mono (métricas e dados).CamadaTecnologiaEstrutura & EstiloHTML5 & CSS3 (Design System customizado)Lógica & EstadoJavaScript ES6+ (Modular)VisualizaçãoChart.jsPersistênciaLocalStorage API & JSON Backup
+| Camada                 | Tecnologia                               |
+| ---------------------- | ---------------------------------------- |
+| **Estrutura & Estilo** | HTML5 & CSS3 (Design System customizado) |
+| **Lógica & Estado**    | JavaScript ES6+ (Modular)                |
+| **Visualização**       | Chart.js                                 |
+| **Persistência**       | LocalStorage API & JSON Backup           |
 
-🗺️ Roadmap de Evolução
-[x] Fundação: Arquitetura Local-First, CRUD local, RPG e Pomodoro.
+---
 
-[ ] Próxima Evolução: Auto-save inteligente (debounce), sistema de Toasts e melhorias visuais.
+## 🗺️ Roadmap de Evolução
 
-[ ] Expansão: Relatórios de progresso avançados e exportação em formatos dedicados.
+* [x] **Fundação:** Arquitetura Local-First, CRUD local, RPG, Pomodoro e Bosque do Mascote.
+* [ ] **Próxima Evolução:** Auto-save inteligente (*debounce*), sistema de Toasts e melhorias visuais.
+* [ ] **Expansão:** Relatórios de progresso avançados e exportação em formatos dedicados.
+* [ ] **Futuro (Cloud):** Sincronização multi-device opcional, backup automático e inteligência preditiva.
 
-[ ] Futuro (Cloud): Sincronização multi-device opcional, backup automático e inteligência preditiva.
+---
 
-💻 Como Executar Localmente
+## 💻 Como Executar Localmente
 
-# Clone o repositório
-git clone [https://github.com/deborac8/mentorii.git](https://github.com/deborac8/mentorii.git)
+### 1. Clone o repositório
 
-# Entre na pasta do projeto
+```bash
+git clone https://github.com/deborac8/mentorii.git
+```
+
+### 2. Entre na pasta do projeto
+
+```bash
 cd mentorii
+```
 
-# Abra auth.html em qualquer navegador moderno
+### 3. Execute a aplicação
+
+Abra o arquivo `auth.html` em qualquer navegador moderno.
+
+---
+
+## 📌 Resumo
+
+O **Mentorii** propõe uma abordagem diferente para produtividade e desenvolvimento de carreira: em vez de tratar tarefas, estudos, metas e hábitos como elementos isolados, o sistema conecta esses componentes em um único fluxo operacional.
+
+**Objetivo → Estratégia → Execução → Evidência → Progresso → Evolução.**
+
+> **Mentorii — transforme intenção em execução.**
