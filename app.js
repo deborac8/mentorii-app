@@ -23,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
     renderWeeklyScheduleTable();
     renderForestTrees();
     initCharts();
-    setupEventListeners();
 });
 
 function renderUserSelector() {
@@ -105,7 +104,10 @@ window.switchTab = function(tabId, element) {
     if (tabId === 'tab-prioridades') renderPriorityMatrix();
     if (tabId === 'tab-cursos') renderActiveCourses();
     if (tabId === 'tab-incubadora') renderActiveCourses();
-    if (tabId === 'tab-floresta') renderForestTrees();
+    if (tabId === 'tab-mentorii-lab') {
+        renderPetStatus();
+        renderForestTrees();
+    }
 };
 
 window.renderDashboard = function() {
@@ -121,7 +123,7 @@ window.renderDashboard = function() {
     const hasName = state.profile.name && state.profile.name.trim().length > 0;
 
     if (pdiTitle) pdiTitle.innerText = hasGoal ? state.profile.targetGoal : "Defina sua Meta Principal";
-    if (pdiDesc) pdiDesc.innerText = state.profile.surgeryFocus ? `Foco Cirúrgico: ${state.profile.surgeryFocus}` : "Vá na aba 'Importar PDI & JSON' para carregar seu plano de estudos.";
+    if (pdiDesc) pdiDesc.innerText = state.profile.surgeryFocus ? `Foco Cirúrgico: ${state.profile.surgeryFocus}` : "Vá na aba 'Importar PDI & Prompt IA' para carregar seu plano de estudos.";
     if (surgeryDesc) surgeryDesc.innerText = state.profile.surgeryFocus ? `Foco Cirúrgico: ${state.profile.surgeryFocus}` : "Defina suas fraquezas e pontos de atenção para cálculo estratégico.";
     if (profileTypeLabel) profileTypeLabel.innerText = `PERFIL PRIVADO: ${(state.profile.profileType || 'GERAL').toUpperCase()} | ${hasName ? state.profile.name : 'Estudante'}`;
     if (topbarSource) topbarSource.innerText = state.profile.indexedFileName || "Nenhum PDI importado";
@@ -163,7 +165,7 @@ function renderThreeFocusFrents() {
     container.innerHTML = "";
 
     if (courses.length === 0) {
-        container.innerHTML = `<div class="card" style="grid-column: 1/-1; color:var(--text-dim); text-align:center; padding:16px;">Nenhuma disciplina ativa. Importe um PDI na aba <b>"Importar PDI & JSON"</b>.</div>`;
+        container.innerHTML = `<div class="card" style="grid-column: 1/-1; color:var(--text-dim); text-align:center; padding:16px;">Nenhuma disciplina ativa. Importe um PDI na aba <b>"Importar PDI & Prompt IA"</b>.</div>`;
         return;
     }
 
@@ -183,7 +185,6 @@ function renderThreeFocusFrents() {
     });
 }
 
-// RENDERIZAÇÃO DO PET CUSTOMIZÁVEL
 window.renderPetStatus = function() {
     const rpg = MentoriiCore.state.rpg || {};
     const avatar = document.getElementById('pet-avatar');
@@ -311,7 +312,7 @@ window.toggleCourseSubItem = function(courseId, itemId) {
             item.done = !item.done;
             if (item.done) MentoriiCore.addFP(10, "str");
             MentoriiCore.save();
-            renderDashboard(); // Recarrega para recalcular a porcentagem global imediatamente
+            renderDashboard();
         }
     }
 };
@@ -400,7 +401,7 @@ window.renderPriorityMatrix = function() {
     if (activeCourses.length === 0) {
         container.innerHTML = `
             <div class="card" style="padding:16px; text-align:center; color:var(--text-dim);">
-                Nenhuma disciplina ativa encontrada. Importe um PDI na aba "Importar PDI & JSON".
+                Nenhuma disciplina ativa encontrada. Importe um PDI na aba "Importar PDI & Prompt IA".
             </div>`;
         return;
     }
@@ -547,17 +548,18 @@ window.renderNotebookCards = function() {
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                 <div>
                     <span class="tag">${nb.subject || 'Geral'}</span>
-                    <h3 style="font-family:var(--mono); font-size:15px; margin-top:2px; display:inline-block;">📓 ${nb.title}</h3>
-                    <button type="button" onclick="editNotebookTitle(${nbIdx})" class="btn-backup" style="font-size:10px; padding:2px 6px; margin-left:6px;">✏️ Editar Nome</button>
+                    <span class="tag" style="background:var(--salvia-light); color:var(--salvia); margin-left:4px;">📂 Tipo: ${nb.type || 'Geral'}</span>
+                    <h3 style="font-family:var(--mono); font-size:15px; margin-top:4px; display:block;">📓 ${nb.title}</h3>
+                    <button type="button" onclick="editNotebookTitle(${nbIdx})" class="btn-backup" style="font-size:10px; padding:2px 6px; margin-top:4px;">✏️ Editar Nome/Tipo</button>
                 </div>
                 <div style="display:flex; gap:6px;">
-                    <button type="button" class="btn-action" style="font-size:11px;" onclick="addNewExerciseToNotebook(${nbIdx})">+ Novo Exercício</button>
-                    <button type="button" class="btn-reset" style="font-size:11px;" onclick="deleteNotebook(${nbIdx})">🗑️ Excluir Caderno</button>
+                    <button type="button" class="btn-action" style="font-size:11px;" onclick="addNewExerciseToNotebook(${nbIdx})">+ Novo Registro</button>
+                    <button type="button" class="btn-reset" style="font-size:11px;" onclick="deleteNotebook(${nbIdx})">🗑️ Excluir</button>
                 </div>
             </div>
 
             <div style="margin-top:12px;">
-                ${(!nb.exercises || nb.exercises.length === 0) ? '<p style="font-size:11px; color:var(--text-dim);">Nenhum exercício registrado neste caderno.</p>' : ''}
+                ${(!nb.exercises || nb.exercises.length === 0) ? '<p style="font-size:11px; color:var(--text-dim);">Nenhum registro ou questão cadastrada neste caderno.</p>' : ''}
                 ${(nb.exercises || []).map((ex, exIdx) => `
                     <div style="background:var(--bg-subtle); border:1px solid var(--border-light); padding:10px 12px; border-radius:var(--radius-sm); margin-bottom:8px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -582,12 +584,14 @@ window.createNewNotebook = function() {
     const title = prompt("Título do novo caderno:");
     if (!title || !title.trim()) return;
 
-    const subject = prompt("Assunto / Tag:", "Geral") || "Geral";
+    const type = prompt("Defina o tipo de caderno (Ex: Laboratório, Banco de Questões, Resumo Teórico, Simulado, Projetos):", "Resumo Teórico") || "Resumo Teórico";
+    const subject = prompt("Assunto / Tag Principal:", "Geral") || "Geral";
 
     if (!Array.isArray(MentoriiCore.state.notebooks)) MentoriiCore.state.notebooks = [];
     MentoriiCore.state.notebooks.push({
         id: `nb_${Date.now()}`,
         title: title.trim(),
+        type: type.trim(),
         subject: subject.trim(),
         exercises: []
     });
@@ -603,9 +607,13 @@ window.editNotebookTitle = function(nbIdx) {
     const newTitle = prompt("Novo título para o caderno:", nb.title);
     if (newTitle && newTitle.trim()) {
         nb.title = newTitle.trim();
-        MentoriiCore.save();
-        renderNotebookCards();
     }
+    const newType = prompt("Novo tipo de caderno (Ex: Laboratório, Simulado, Questões):", nb.type || "Resumo");
+    if (newType && newType.trim()) {
+        nb.type = newType.trim();
+    }
+    MentoriiCore.save();
+    renderNotebookCards();
 };
 
 window.deleteNotebook = function(nbIdx) {
@@ -621,11 +629,11 @@ window.addNewExerciseToNotebook = function(nbIdx) {
     const nb = (MentoriiCore.state.notebooks || [])[nbIdx];
     if (!nb) return;
 
-    const name = prompt("Nome do Exercício / Capítulo:");
+    const name = prompt("Nome do Registro / Questão / Experimento:");
     if (!name || !name.trim()) return;
 
     const note = prompt("Observação / Resumo técnico (opcional):", "") || "";
-    const diff = prompt("Dificuldade (Tranquilo, Médio, Desafiador):", "Médio") || "Médio";
+    const diff = prompt("Dificuldade ou Status (Tranquilo, Médio, Desafiador):", "Médio") || "Médio";
 
     if (!Array.isArray(nb.exercises)) nb.exercises = [];
     nb.exercises.unshift({
@@ -650,7 +658,6 @@ window.deleteExerciseFromNotebook = function(nbIdx, exIdx) {
     }
 };
 
-// POMODORO COM PAUSA E REGISTRO DE FLORESTA
 let pomoTimerInterval = null;
 
 window.togglePomodoro = function() {
@@ -674,8 +681,7 @@ window.togglePomodoro = function() {
                 pomo.isRunning = false;
                 if (btn) btn.innerText = "▶ Iniciar";
                 
-                // Concluiu com sucesso o ciclo de 25 min! Planta uma árvore na floresta
-                const taskName = pomo.currentTaskName || "Sessão de Foco";
+                const taskName = pomo.currentTaskName || "Estudo Focado";
                 if (!MentoriiCore.state.forest) MentoriiCore.state.forest = { trees: [] };
                 MentoriiCore.state.forest.trees.unshift({
                     id: `tree_${Date.now()}`,
@@ -684,7 +690,7 @@ window.togglePomodoro = function() {
                     icon: ['🌲', '🌳', '🌸', '🌲', '🌿'][Math.floor(Math.random() * 5)]
                 });
 
-                alert(`⏱️ Ciclo de Foco "${taskName}" Concluído!\n🌳 Uma nova árvore foi plantada na sua Floresta Mentorii! +15 FP.`);
+                alert(`⏱️ Ciclo "${taskName}" Concluído!\n🌲 Uma nova árvore foi plantada no Bosque do Mascote! +15 FP.`);
                 MentoriiCore.addFP(15, "int");
                 pomo.timeRemaining = 25 * 60;
                 renderDashboard();
@@ -724,22 +730,21 @@ window.customizePomodoroActivity = function() {
     }
 };
 
-// RENDERIZADOR DA FLORESTA MENTORII (ESTILO FOREST)
 window.renderForestTrees = function() {
     const container = document.getElementById('forest-grid-container');
     if (!container) return;
 
     const trees = MentoriiCore.state.forest?.trees || [];
     if (trees.length === 0) {
-        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:var(--text-dim); padding:30px; font-family:var(--mono);">Sua floresta está vazia. Conclua ciclos no Relógio Pomodoro para plantar suas primeiras árvores! 🌲</div>`;
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:var(--text-dim); padding:16px; font-family:var(--mono); font-size:11px;">O bosque do seu pet está vazio. Conclua ciclos no Pomodoro para plantar as primeiras árvores! 🌲</div>`;
         return;
     }
 
     container.innerHTML = trees.map(t => `
-        <div class="tree-card" style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px; text-align:center;">
-            <div style="font-size:38px; margin-bottom:4px;">${t.icon}</div>
-            <div style="font-family:var(--mono); font-size:11px; font-weight:bold; color:var(--text);">${t.name}</div>
-            <div style="font-family:var(--mono); font-size:9.5px; color:var(--text-dim); margin-top:2px;">Plantada em ${t.date}</div>
+        <div class="tree-card" style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+            <div style="font-size:32px; margin-bottom:2px;">${t.icon}</div>
+            <div style="font-family:var(--mono); font-size:10px; font-weight:bold; color:var(--text);">${t.name}</div>
+            <div style="font-family:var(--mono); font-size:9px; color:var(--text-dim); margin-top:2px;">${t.date}</div>
         </div>
     `).join('');
 };
@@ -1307,7 +1312,6 @@ window.submitOnboardingForm = function() {
     alert("🎉 Configurações salvas com sucesso!");
 };
 
-// PROCESSADORES DE IMPORTAÇÃO (ARQUIVO E TEXTO)
 window.handleApplyPastedPDI = function() {
     const textarea = document.getElementById('paste-pdi-json-input');
     const text = textarea ? textarea.value : "";
@@ -1383,8 +1387,8 @@ window.clearIndexedPDI = function() {
         renderDashboard();
         renderAllTabs();
         
-        const statusBox = document.getElementById('pdi-file-status-box');
-        if (statusBox) statusBox.style.display = 'none';
+        const $fx = document.getElementById('pdi-file-status-box');
+        if ($fx) $fx.style.display = 'none';
         alert("🔄 Dados de PDI limpos com sucesso!");
     }
 };
@@ -1439,25 +1443,6 @@ window.exportBackupJSON = function() {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-};
-
-window.importBackupJSON = function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            MentoriiCore.state = JSON.parse(e.target.result);
-            MentoriiCore.save();
-            renderDashboard();
-            renderAllTabs();
-            alert("📂 PDI / Backup importado com sucesso!");
-        } catch (err) {
-            alert("❌ Arquivo JSON de PDI inválido.");
-        }
-    };
-    reader.readAsText(file);
 };
 
 window.resetAllAppData = function() {

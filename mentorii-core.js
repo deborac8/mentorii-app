@@ -19,8 +19,8 @@ const MentoriiCore = {
             sprints: [],
             habits: [],
             rpg: {
-                petName: "Meu Pet de Foco",
-                petType: "cat", // 'cat', 'fox', 'owl', 'panda', 'robot'
+                petName: "Meu Pet",
+                petType: "cat",
                 petStage: "egg",
                 level: 1,
                 fp: 0,
@@ -29,7 +29,7 @@ const MentoriiCore = {
                 dex: 0
             },
             forest: {
-                trees: [] // Lista de árvores plantadas ao concluir ciclos Pomodoro
+                trees: []
             },
             pomodoro: {
                 mode: "foco",

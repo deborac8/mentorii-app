@@ -17,7 +17,7 @@
             <div>
                 <div class="eyebrow">Career Operating System</div>
                 <h1>Painel Mentorii — Cockpit Inteligente</h1>
-                <p class="topbar-description" id="user-pdi-desc">Com Oráculo de Decisão, Pomodoro, Mascote Tamagotchi e Floresta Viva.</p>
+                <p class="topbar-description" id="user-pdi-desc">Com Oráculo de Decisão, Pomodoro, Mascote Virtual e Bosque de Foco.</p>
                 <div style="margin-top:6px; font-size:11px; font-family:var(--mono); color:var(--text-dim); display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                     <span>📂 Fonte: <span id="topbar-pdi-source" style="color:var(--purple); font-weight:bold;">Nenhum PDI importado</span></span>
                     <span>|</span>
@@ -49,7 +49,7 @@
         <nav class="nav-tabs">
             <button type="button" class="tab-btn active" onclick="switchTab('tab-importar', this)">📥 Importar PDI & Prompt IA</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-foco', this)">🎯 Foco & Pomodoro</button>
-            <button type="button" class="tab-btn" onclick="switchTab('tab-mentorii-lab', this)">🐾 Mascote & Mundo (Tamagotchi)</button>
+            <button type="button" class="tab-btn" onclick="switchTab('tab-mentorii-lab', this)">🐾 Mascote & Bosque (RPG)</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-prioridades', this)">★ Prioridades & Estágio</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-diario', this)">📋 Diário de Progresso</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-notebook', this)">📓 Notebook Técnico</button>
@@ -154,7 +154,7 @@ Com base nas minhas respostas, gere rigorosamente um arquivo JSON no seguinte fo
                 </div>
 
                 <div class="pomodoro-box">
-                    <div class="pomodoro-title">⏱️ Relógio Pomodoro & Floresta</div>
+                    <div class="pomodoro-title">⏱️ Relógio Pomodoro & Bosque</div>
                     <div style="font-size:11px; font-family:var(--mono); color:var(--purple); margin:4px 0; font-weight:bold;" id="pomo-active-task-label">Atividade: Estudo Focado</div>
                     <div class="pomodoro-display" id="pomo-timer-display">25:00</div>
                     <div class="pomodoro-cycles" id="pomo-mode-status">🎯 MODO FOCO</div>
@@ -180,13 +180,13 @@ Com base nas minhas respostas, gere rigorosamente um arquivo JSON no seguinte fo
             <section class="priority-grid" id="three-focus-frents-grid"></section>
         </section>
 
-        <!-- ABA MENTORII RPG & FLORESTA INTEGRADA (TAMAGOTCHI DO MUNDO DO PET) -->
+        <!-- ABA MENTORII RPG & BOSQUE INTEGRADO -->
         <section id="tab-mentorii-lab" class="tab-content">
             <div class="card card-purple-gradient">
                 <div class="flex-between">
                     <div>
-                        <span class="eyebrow">🐾 Ecossistema Tamagotchi & Floresta Viva</span>
-                        <h2>O Mundo do seu Mascote</h2>
+                        <span class="eyebrow">🐾 Ecossistema de Mascote & Bosque de Foco</span>
+                        <h2>O Mundo do seu Mascote & Habitat</h2>
                     </div>
                     <div class="text-right">
                         <div class="readiness-score-val" id="readiness-score-text">0%</div>
@@ -215,12 +215,11 @@ Com base nas minhas respostas, gere rigorosamente um arquivo JSON no seguinte fo
                 </div>
             </div>
 
-            <!-- Bosque / Floresta do Pet integrado na mesma aba -->
             <div class="card" style="border-color:var(--salvia);">
                 <div class="flex-between mb-16">
                     <div>
-                        <span class="eyebrow" style="color:var(--salvia);">🌲 O Bosque do Mascote (Floresta Estilo Forest)</span>
-                        <h3>Árvores Cultivadas pelo Foco nos Estudos</h3>
+                        <span class="eyebrow" style="color:var(--salvia);">🌲 O Bosque do Mascote (Árvores Digitais de Foco)</span>
+                        <h3>Árvores Cultivadas pelas Sessões de Estudo</h3>
                     </div>
                 </div>
                 <p class="card-desc">Cada ciclo Pomodoro concluído cultiva uma nova árvore no habitat do seu pet, expandindo o mundo dele!</p>

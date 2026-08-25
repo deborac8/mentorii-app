@@ -1,32 +1,44 @@
-Aqui está o texto que você enviou, devidamente editado e formatado em Markdown puro e rigoroso (com títulos corretos, listas formatadas, blocos de código ajustados, tabelas estruturadas e sem blocos soltos), indo até a seção de execução local:
+<div align="center">
 
-🚀 Mentorii — Career Operating System
-Mentorii é um sistema operacional de carreira e estudos (Career OS) desenvolvido no modelo Local-First, projetado para transformar planos de desenvolvimento individual (PDI), estudos, rotina de foco e produtividade em um sistema único de execução e acompanhamento.
+# 🚀 Mentorii — Career Operating System
 
-O Mentorii combina planejamento estratégico, execução, acompanhamento de progresso, organização acadêmica/profissional e gamificação em um cockpit desenvolvido para reduzir a distância entre objetivos de longo prazo e ações concretas do dia a dia.
+<p align="center">
+  <b>Um Career OS <i>Local-First</i> para transformar PDI, estudos e rotina de execução em um sistema operacional pessoal de evolução.</b>
+</p>
 
-💡 Origem e Filosofia de Construção
-O Mentorii nasceu de uma necessidade prática de organização pessoal: criar uma ferramenta sob medida para centralizar a própria rotina de estudos, planejamento e execução de carreira.
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-MVP%20Evolutivo-9D7BB0?style=for-the-badge&logo=codeforces&logoColor=white" alt="Status">
+  <img src="https://img.shields.io/badge/Architecture-Local--First-82B39A?style=for-the-badge&logo=icloud&logoColor=white" alt="Architecture">
+  <img src="https://img.shields.io/badge/Stack-Vanilla%20JS%20%7C%20CSS3-E287A8?style=for-the-badge&logo=javascript&logoColor=white" alt="Stack">
+</p>
+
+</div>
+
+---
+
+## 💡 Origem & Filosofia de Construção
+
+O **Mentorii** nasceu de uma necessidade prática de organização pessoal: criar uma ferramenta sob medida para centralizar a própria rotina de estudos, planejamento e execução de carreira.
 
 O projeto foi construído de forma modular e iterativa, moldado passo a passo a partir de necessidades reais e de testes contínuos:
 
-Evolução Baseada em Testes: Cada nova atualização passou por ciclos de validação de uso, corrigindo falhas de interface, otimizando o fluxo de dados e eliminando complexidades desnecessárias.
+* **Evolução Baseada em Testes:** Cada nova atualização passou por ciclos de validação de uso, corrigindo falhas de interface, otimizando o fluxo de dados e eliminando complexidades desnecessárias.
+* **Critério e Ética no Desenvolvimento:** A escolha das funcionalidades e da arquitetura priorizou a autonomia, a clareza e a utilidade real do produto, mantendo uma postura transparente sobre os limites e as potencialidades de ferramentas digitais e assistidas por IA.
 
-Critério e Ética no Desenvolvimento: A escolha das funcionalidades e da arquitetura priorizou a autonomia, a clareza e a utilidade real do produto, mantendo uma postura transparente sobre os limites e as potencialidades de ferramentas digitais e assistidas por IA.
+---
 
-🧭 Visão do Produto
-O Mentorii não pretende ser apenas mais um gerenciador de tarefas.
+## 🧭 Visão do Produto
 
-A proposta é funcionar como um Career Operating System: uma camada operacional entre aquilo que o usuário deseja alcançar e aquilo que precisa ser executado para chegar lá.
+O Mentorii não pretende ser apenas mais um gerenciador de tarefas. A proposta é funcionar como um **Career Operating System**: uma camada operacional entre aquilo que o usuário deseja alcançar e aquilo que precisa ser executado para chegar lá.
 
-Plaintext
+```text
                   ┌─────────────────────────┐
                   │      OBJETIVO / PDI     │
                   └────────────┬────────────┘
                                │
                                ▼
                   ┌─────────────────────────┐
-                  │  PRIORIDADES & ESTRATÉGIA│
+                  │ PRIORIDADES & ESTRATÉGIA│
                   └────────────┬────────────┘
                                │
                                ▼
@@ -49,59 +61,44 @@ Plaintext
                   ┌─────────────────────────┐
                   │      EVOLUÇÃO & RPG     │
                   └─────────────────────────┘
-O princípio central é:
+```
 
-Planejamento só possui valor quando consegue produzir execução observável.
+> **Princípio Central:** *Planejamento só possui valor quando consegue produzir execução observável.*
 
-🎯 Propósito do Projeto
+---
+
+## 🎯 Propósito do Projeto
+
 O Mentorii foi concebido com quatro objetivos principais:
 
-1. Transformar planejamento em execução
-Converter objetivos abstratos de carreira e estudo em estruturas operacionais:
+1. **Transformar planejamento em execução:** Converter objetivos abstratos de carreira e estudo em cursos, módulos, tarefas, hábitos, sessões de foco e evidências de execução.
+2. **Criar uma visão única do progresso:** Centralizar informações que normalmente ficam espalhadas entre aplicativos de tarefas, calendários, planilhas, anotações, plataformas de cursos e documentos de PDI.
+3. **Utilizar gamificação funcional:** Elementos de RPG, atributos dinâmicos e um mascote virtual transformam o esforço de estudo em feedback visual (`Focus Points - FP`).
+4. **Preservar autonomia e privacidade:** Arquitetura sem dependência de infraestrutura em nuvem, servidor backend ou banco de dados externo.
 
-cursos;
+---
 
-módulos;
+## 🧠 Filosofia: Local-First
 
-tarefas;
+A aplicação prioriza o modelo **Client-Side**. Os dados permanecem estritamente no dispositivo do usuário através do `localStorage`, enquanto a aplicação executa sua lógica diretamente no navegador.
 
-hábitos;
+### Benefícios
 
-sessões de foco;
+* ⚡ **Resposta instantânea:** Zero latência de rede.
+* 🔒 **Privacidade total:** Seus dados pessoais nunca saem do seu navegador.
+* 💰 **Custo zero:** Infraestrutura totalmente estática.
+* 🌐 **Funcionamento autônomo:** Roda sem backend dedicado.
+* 📦 **Portabilidade:** Exportação e importação completa via arquivos JSON.
 
-prioridades;
+> *Seus objetivos, seus dados, seu dispositivo.*
 
-evidências de execução.
+---
 
-2. Criar uma visão única do progresso
-Centralizar informações que normalmente ficam espalhadas entre aplicativos de tarefas, calendários, planilhas, anotações, plataformas de cursos e documentos de PDI.
+## 🏗️ Arquitetura & Estrutura
 
-3. Utilizar gamificação de forma funcional
-Elementos de RPG, atributos, progresso e um mascote virtual transformam execução real em feedback visual conectado diretamente ao ganho de Focus Points (FP).
+O sistema separa claramente **estado, regras, interface e persistência**:
 
-4. Preservar autonomia e privacidade
-O sistema foi projetado para funcionar localmente, sem depender de infraestrutura de backend ou banco de dados em nuvem.
-
-🧠 Filosofia: Local-First
-A arquitetura prioriza o modelo Client-Side. Os dados permanecem no dispositivo do usuário através do localStorage, enquanto a aplicação executa sua lógica diretamente no navegador.
-
-Benefícios
-⚡ Resposta instantânea.
-
-🔒 Dados pessoais mantidos estritamente no dispositivo local.
-
-💰 Custo de infraestrutura zero.
-
-🌐 Funcionamento sem dependência de servidores dedicados.
-
-📦 Portabilidade total via exportação e importação manual de backups em JSON.
-
-Seus objetivos, seus dados, seu dispositivo.
-
-🏗️ Arquitetura
-A arquitetura do Mentorii separa claramente estado, regras, interface e persistência:
-
-Plaintext
+```text
 ┌──────────────────────────────────────────────┐
 │                    UI                        │
 │ index.html / auth.html / componentes        │
@@ -110,7 +107,7 @@ Plaintext
                        ▼
 ┌──────────────────────────────────────────────┐
 │               CONTROLLER                     │
-│                 app.js                      │
+│                  app.js                      │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -130,72 +127,94 @@ Plaintext
               │     Oracle      │
               │ Regras / análise│
               └─────────────────┘
-A base do sistema utiliza contratos de dados estruturados para gerenciar operações CRUD previsíveis, garantindo integridade e evitando inconsistências lógicas.
+```
 
-📁 Estrutura do Projeto
-Plaintext
+### 📁 Organização de Pastas
+
+```text
 mentorii/
-│
 ├── 📄 auth.html          # Autenticação, isolamento de perfis e PIN de segurança
 ├── 📄 index.html         # Cockpit principal, navegação por abas e modais
 ├── 📄 mentorii-core.js   # Estado global, CRUD, persistência e mecânicas de RPG
 ├── 📄 oracle.js          # Motor analítico, parser determinístico e oráculo
 ├── 📄 style.css          # Design System customizado ('Pastel Tech')
 └── 📄 README.md          # Documentação oficial e portfólio
-✨ Principais Funcionalidades
-🎯 Foco & Pomodoro: Cockpit integrado com cronômetro, pausa e rastreamento de blocos de execução.
+```
 
-★ Prioridades & Estratégia: Matriz de decisão operacional para classificar frentes ativas.
+---
 
-📋 Diário de Progresso: Indicadores quantitativos e visuais da evolução global e por categoria.
+## ✨ Principais Funcionalidades
 
-📓 Notebook Técnico: Armazenamento de cadernos temáticos, anotações e evidências de desenvolvimento.
+* **🎯 Foco, Pomodoro & Bosque:** Cockpit integrado com cronômetro, pausa e plantio automático de árvores digitais a cada ciclo concluído.
+* **★ Prioridades & Estratégia:** Matriz de decisão operacional para classificar frentes ativas.
+* **📋 Diário de Progresso:** Indicadores quantitativos e visuais da evolução global e por categoria.
+* **📓 Notebook Técnico:** Armazenamento de cadernos temáticos, anotações e evidências de desenvolvimento.
+* **🐾 Mascote & RPG:** Sistema de evolução com mascote virtual acoplado ao esforço real de conclusão de metas.
+* **🌸 Hábitos & Agenda:** Acompanhamento de consistência semanal e calendário de compromissos.
+* **📚 Cursos & Incubadora:** Gestão estruturada de disciplinas ativas e zona de espera controlada.
 
-🐾 Mascote & RPG: Gamificação acoplada ao esforço real, onde o pet evolui conforme o progresso das metas.
+---
 
-🌸 Hábitos & Agenda: Acompanhamento de consistência semanal e calendário de compromissos.
+## 🤖 Desenvolvimento Assistido por IA
 
-📚 Cursos & Incubadora: Gestão estruturada de disciplinas ativas e zona de espera controlada para frentes secundárias.
+O Mentorii serve como uma demonstração prática de **AI-Driven Development**.
 
-🤖 Desenvolvimento Assistido por IA (Transparência de Portfólio)
-O Mentorii serve também como uma demonstração prática de AI-Driven Development.
+* **O Papel da IA:** Ferramentas como o *Gemini* atuaram como copilotos de alta performance para prototipagem rápida, estruturação de componentes, revisão de código e auxílio na depuração.
+* **O Papel do Desenvolvedor:** A concepção do produto, modelagem arquitetural (*Local-First*), decisões de UX e curadoria linha a linha foram integralmente conduzidas pelo autor do projeto.
 
-O Papel da IA: Ferramentas de IA (como o Gemini) foram utilizadas como copilotos técnicos de alta performance para prototipagem rápida, estruturação de componentes, revisão de código e auxílio na depuração de comportamentos assíncronos.
+---
 
-O Papel do Desenvolvedor: A concepção do produto, a modelagem da arquitetura Local-First, a tomada de decisões de UX, a curadoria e o refinamento linha a linha do código-fonte foram integralmente conduzidos pelo autor do projeto.
+## 🎨 Design System & Tecnologias
 
-Esta abordagem evidencia a maturidade de utilizar tecnologias modernas de IA para maximizar a produtividade e a velocidade de entrega sem abrir mão do rigor técnico e do entendimento profundo do software construído.
+* **Estética:** *Pastel Tech*, com tons suaves e foco analítico em:
 
-🎨 Design System — Pastel Tech
-A identidade visual prioriza uma estética limpa, com contraste suave e foco na leitura analítica:
+  * Roxo `#9D7BB0`
+  * Verde sálvia `#82B39A`
+  * Rosa `#E287A8`
+* **Tipografia:** `IBM Plex Sans` para interface e `JetBrains Mono` para métricas e dados.
 
-Paleta: Tons pastéis com destaque em roxo/lavanda (#9D7BB0), verde sálvia (#82B39A), rosa (#E287A8) e laranja (#E6A15C).
+| Camada                 | Tecnologia                               |
+| ---------------------- | ---------------------------------------- |
+| **Estrutura & Estilo** | HTML5 & CSS3 (Design System customizado) |
+| **Lógica & Estado**    | JavaScript ES6+ (Modular)                |
+| **Visualização**       | Chart.js                                 |
+| **Persistência**       | LocalStorage API & JSON Backup           |
 
-Tipografia: IBM Plex Sans para textos e interfaces, e JetBrains Mono para métricas, códigos e cronômetros.
+---
 
-🛠️ Tecnologias
-Tecnologia	Função
-HTML5 & CSS3	Estrutura e Design System Pastel Tech
-JavaScript ES6+	Lógica e Gestão de Estado Modular
-Chart.js	Visualização analítica de dados
-LocalStorage API	Persistência local Client-Side
-JSON	Contratos de dados e portabilidade de backup
-🗺️ Roadmap de Evolução
-[x] Fundação: Arquitetura Local-First, CRUD local, RPG e Pomodoro.
+## 🗺️ Roadmap de Evolução
 
-[ ] Próxima Evolução: Auto-save inteligente (debounce), sistema de Toasts e melhorias no feedback visual.
+* [x] **Fundação:** Arquitetura Local-First, CRUD local, RPG, Pomodoro e Bosque do Mascote.
+* [ ] **Próxima Evolução:** Auto-save inteligente (*debounce*), sistema de Toasts e melhorias visuais.
+* [ ] **Expansão:** Relatórios de progresso avançados e exportação em formatos dedicados.
+* [ ] **Futuro (Cloud):** Sincronização multi-device opcional, backup automático e inteligência preditiva.
 
-[ ] Expansão: Relatórios de progresso avançados e exportação de dados em formatos dedicados.
+---
 
-[ ] Futuro (Versão Cloud): Sincronização multi-device opcional, backup automático e inteligência preditiva.
+## 💻 Como Executar Localmente
 
-💻 Como Executar Localmente
-Clone o repositório:
+### 1. Clone o repositório
 
-Bash
+```bash
 git clone https://github.com/deborac8/mentorii.git
-Entre na pasta:
+```
 
-Bash
+### 2. Entre na pasta do projeto
+
+```bash
 cd mentorii
-Abra o arquivo auth.html em qualquer navegador moderno.
+```
+
+### 3. Execute a aplicação
+
+Abra o arquivo `auth.html` em qualquer navegador moderno.
+
+---
+
+## 📌 Resumo
+
+O **Mentorii** propõe uma abordagem diferente para produtividade e desenvolvimento de carreira: em vez de tratar tarefas, estudos, metas e hábitos como elementos isolados, o sistema conecta esses componentes em um único fluxo operacional.
+
+**Objetivo → Estratégia → Execução → Evidência → Progresso → Evolução.**
+
+> **Mentorii — transforme intenção em execução.**

@@ -373,7 +373,6 @@ button {
     padding: 5px 10px;
 }
 
-/* ESTILOS DA FLORESTA MENTORII (ESTILO FOREST) */
 .tree-card {
     background: var(--bg-subtle);
     border: 1px solid var(--border);
@@ -515,7 +514,6 @@ button {
     text-align: left;
 }
 
-/* ESTILOS DA GRADE CURRICULAR INTERATIVA */
 .schedule-cell {
     border: 1px solid var(--border-light);
     background: var(--bg-panel);

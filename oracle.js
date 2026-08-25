@@ -6,13 +6,13 @@ const MentoriiOracle = {
 
     generateFallbackRecommendation: function(userData) {
         if (!userData || !userData.profile || !userData.profile.targetGoal || userData.profile.targetGoal.trim().length === 0) {
-            return "✨ <b>Diagnóstico do Mentor:</b> Bem-vindo ao Mentorii! Vá na aba <b>'📥 Importar PDI & JSON'</b> para carregar seu plano de estudos.";
+            return "✨ <b>Diagnóstico do Mentor:</b> Bem-vindo ao Mentorii! Vá na aba <b>'📥 Importar PDI & Prompt IA'</b> para carregar seu plano de estudos.";
         }
 
         const goal = userData.profile.targetGoal;
-        const surgery = userData.profile.surgeryFocus || "prática consistente e resolução de exercícios";
+        const surgery = userData.profile.surgeryFocus || "resolução intensiva de simulados e foco em exatas/biológicas";
 
-        return `🔬 <b>Diagnóstico do Mentor:</b> Para consolidar <b>${goal}</b>, seu foco cirúrgico prioritário é <b>${surgery}</b>.<br>👉 <b>Recomendação:</b> Execute blocos de Pomodoro dedicados para resolução de exercícios e registre o progresso nos seus cadernos!`;
+        return `🔬 <b>Diagnóstico do Mentor:</b> Para conquistar a vaga em <b>${goal}</b>, seu foco cirúrgico prioritário é <b>${surgery}</b>.<br>👉 <b>Recomendação:</b> Execute blocos de Pomodoro focados nas disciplinas de maior peso e registre sua evolução diária!`;
     },
 
     calculateReadinessScore: function(activeCourses) {
@@ -42,71 +42,65 @@ const MentoriiOracle = {
         cleanText = cleanText.replace(/```json/gi, '').replace(/```html/gi, '').replace(/```/g, '').trim();
 
         let parsedData = null;
-        const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+        const jsonMatch = cleanText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
         if (jsonMatch) {
-            try { parsedData = JSON.parse(jsonMatch[0]); } catch (e) {}
+            try { parsedData = JSON.parse(jsonMatch[0]); } catch (e) { console.error("Erro ao parsear JSON:", e); }
         }
 
         let allFoundItems = [];
-        let targetGoal = "";
-        let surgeryFocus = "";
+        let targetGoal = "Plano de Estudos Individual";
+        let surgeryFocus = "Consolidação de Fundamentos e Prática";
 
-        if (parsedData && typeof parsedData === "object") {
-            targetGoal = findStringInObject(parsedData, ['objetivo', 'meta', 'goal', 'titulo', 'targetGoal']) || "";
-            surgeryFocus = findStringInObject(parsedData, ['foco', 'cirurgico', 'fraqueza', 'surgeryFocus', 'prioridade']) || "";
+        if (parsedData) {
+            if (parsedData.profile) {
+                targetGoal = parsedData.profile.targetGoal || parsedData.profile.meta || targetGoal;
+                surgeryFocus = parsedData.profile.surgeryFocus || parsedData.profile.foco || surgeryFocus;
+            }
 
-            const rawCards = parsedData.cards || findAllArraysInObject(parsedData).flat();
+            let rawList = parsedData.cards || parsedData.disciplinas || parsedData.materias || parsedData.frentes || (Array.isArray(parsedData) ? parsedData : null);
 
-            rawCards.forEach((item, idx) => {
-                let name = typeof item === 'string' ? item : (item.nome || item.name || item.disciplina || item.materia || item.titulo);
-                let label = typeof item === 'object' ? (item.categoria || item.label || item.frente || "Geral") : "Geral";
+            if (!rawList) {
+                const arrays = findAllArraysInObject(parsedData);
+                if (arrays.length > 0) rawList = arrays[0];
+            }
 
-                if (name && isValidCourseName(name)) {
-                    let subItems = [];
-                    if (typeof item === 'object' && Array.isArray(item.modulos || item.items || item.checklists)) {
-                        subItems = (item.modulos || item.items || item.checklists).map((m, mIdx) => ({
-                            id: `sub_${mIdx}_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-                            name: typeof m === 'string' ? m : (m.nome || m.title || `Módulo ${mIdx+1}`),
-                            done: false
-                        }));
+            if (Array.isArray(rawList)) {
+                rawList.forEach((item, idx) => {
+                    let name = "";
+                    let label = "Core";
+                    let subModulos = [];
+
+                    if (typeof item === 'string') {
+                        name = item;
+                    } else if (typeof item === 'object' && item !== null) {
+                        name = item.nome || item.name || item.disciplina || item.materia || item.titulo || item.front;
+                        label = item.categoria || item.label || item.frente || "Core";
+                        
+                        const rawMods = item.modulos || item.items || item.checklists || item.topicos;
+                        if (Array.isArray(rawMods)) {
+                            subModulos = rawMods.map((m, mIdx) => ({
+                                id: `sub_${mIdx}_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+                                name: typeof m === 'string' ? m : (m.nome || m.title || `Módulo ${mIdx+1}`),
+                                done: false
+                            }));
+                        }
                     }
 
-                    allFoundItems.push({
-                        id: `course_${idx}_${Date.now()}`,
-                        name: name.trim(),
-                        label: label.trim(),
-                        completed: false,
-                        items: subItems.length > 0 ? subItems : [
-                            { id: `i_${idx}_1`, name: "Módulo 1: Conceitos e Fundamentos", done: false },
-                            { id: `i_${idx}_2`, name: "Módulo 2: Prática e Resolução", done: false },
-                            { id: `i_${idx}_3`, name: "Módulo 3: Exercícios de Fixação", done: false }
-                        ]
-                    });
-                }
-            });
-        }
-
-        if (allFoundItems.length === 0) {
-            const lines = cleanText.replace(/<[^>]*>/g, '\n').split('\n')
-                .map(l => l.trim())
-                .filter(l => l.length > 2 && !l.includes('{') && !l.includes('}') && !l.includes('":') && !l.toLowerCase().startsWith('doctype'));
-
-            lines.forEach((line, idx) => {
-                const clean = line.replace(/^[•\-\*\d\.\)\:]+\s*/, '').replace(/[\",]/g, '').trim();
-                if (isValidCourseName(clean)) {
-                    allFoundItems.push({ 
-                        id: `course_${idx}_${Date.now()}`,
-                        name: clean, 
-                        label: "Geral", 
-                        completed: false,
-                        items: [
-                            { id: `i_${idx}_1`, name: "Módulo 1: Conceitos e Fundamentos", done: false },
-                            { id: `i_${idx}_2`, name: "Módulo 2: Prática e Resolução", done: false },
-                            { id: `i_${idx}_3`, name: "Módulo 3: Exercícios de Fixação", done: false }
-                        ] 
-                    });
-                }
-            });
+                    if (name && typeof name === 'string' && isValidCourseName(name)) {
+                        allFoundItems.push({
+                            id: `course_${idx}_${Date.now()}`,
+                            name: name.trim(),
+                            label: label.trim(),
+                            completed: false,
+                            items: subModulos.length > 0 ? subModulos : [
+                                { id: `i_${idx}_1`, name: "Módulo 1: Teoria e Fundamentos", done: false },
+                                { id: `i_${idx}_2`, name: "Módulo 2: Resolução de Questões", done: false },
+                                { id: `i_${idx}_3`, name: "Módulo 3: Revisão Ativa", done: false }
+                            ]
+                        });
+                    }
+                });
+            }
         }
 
         if (allFoundItems.length === 0) return null;
@@ -115,10 +109,7 @@ const MentoriiOracle = {
         const incubatedCourses = [];
 
         allFoundItems.forEach(item => {
-            const nameLower = item.name.toLowerCase();
-            const isCertOrBacklog = nameLower.includes('certificado') || nameLower.includes('coursera') || nameLower.includes('udemy') || nameLower.includes('opcional') || nameLower.includes('extra');
-
-            if (activeCourses.length < 6 && !isCertOrBacklog && !isDuplicateCourse(activeCourses, item.name)) {
+            if (activeCourses.length < 6 && !isDuplicateCourse(activeCourses, item.name)) {
                 activeCourses.push(item);
             } else if (!isDuplicateCourse(incubatedCourses, item.name) && !isDuplicateCourse(activeCourses, item.name)) {
                 incubatedCourses.push(item);
@@ -130,7 +121,7 @@ const MentoriiOracle = {
                 targetGoal: targetGoal,
                 surgeryFocus: surgeryFocus
             },
-            activeCourses: activeCourses.length > 0 ? activeCourses : incubatedCourses.slice(0, 6),
+            activeCourses: activeCourses,
             incubatedCourses: incubatedCourses
         };
     }
@@ -138,40 +129,30 @@ const MentoriiOracle = {
 
 function isValidCourseName(name) {
     if (!name || typeof name !== 'string') return false;
-    const clean = name.toLowerCase().trim();
+    const clean = name.trim();
+
+    if (clean.length < 3 || clean.length > 60) return false;
+    if (clean.toLowerCase().includes("onde você joga") || clean.toLowerCase().includes("frente de estudo") || clean.includes("Ex:")) {
+        return false;
+    }
 
     const blacklistedPhrases = [
         'substitua as cores', 'etiquetas', 'para onde você arrasta',
         'para trabalhos em grupo', 'o cartão exato', 'onde você joga todas',
         'apenas os cursos e disciplinas', 'reescreva', 'descreva',
         'transforme', 'publique', 'dispersão de foco', 'padronização comercial',
-        'dopamina pura', 'ver essa lista crescer', 'escopo maior que o prazo',
-        'portfólio não traduzido', 'achado da análise', 'para quem estuda',
-        'instruções de uso'
+        'dopamina pura', 'ver essa lista crescer', 'escopo maior que o prazo'
     ];
 
-    if (blacklistedPhrases.some(phrase => clean.includes(phrase))) return false;
-    if (clean.length < 3 || clean.length > 80) return false;
+    if (blacklistedPhrases.some(phrase => clean.toLowerCase().includes(phrase))) return false;
 
     return true;
-}
-
-function findStringInObject(obj, keywords) {
-    if (!obj || typeof obj !== 'object') return null;
-    for (const key in obj) {
-        const lowerKey = key.toLowerCase();
-        if (keywords.some(k => lowerKey.includes(k))) {
-            if (typeof obj[key] === 'string') return obj[key];
-            if (typeof obj[key] === 'object') return findStringInObject(obj[key], keywords);
-        }
-    }
-    return null;
 }
 
 function findAllArraysInObject(obj, results = []) {
     if (!obj || typeof obj !== 'object') return results;
     for (const key in obj) {
-        if (['pessoa', 'gerado_em', 'meta', 'autor', 'versao'].includes(key.toLowerCase())) continue;
+        if (['pessoa', 'gerado_em', 'meta', 'autor', 'versao', 'profile'].includes(key.toLowerCase())) continue;
         if (Array.isArray(obj[key])) {
             results.push(obj[key]);
         } else if (typeof obj[key] === 'object') {
