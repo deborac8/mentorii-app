@@ -71,16 +71,6 @@ Chart.js para visualização analítica de produtividade.
 
 Local Storage API para persistência de dados local orientada à privacidade.
 
-💻 Como Executar Localmente
-Clone o repositório:
-
-Bash
-git clone [https://github.com/deborac8/mentorii.git](https://github.com/deborac8/mentorii.git)
-
-Abra a pasta do projeto.
-
-Abra o arquivo auth.html diretamente em qualquer navegador moderno.
-
 ---
 
 ### 📦 Salvando a Atualização no GitHub
