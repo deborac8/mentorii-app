@@ -235,8 +235,8 @@ button {
 }
 
 .card-purple-gradient {
-    background: linear-gradient(135deg, var(--purple-light) 0%, #FFFFFF 100%);
-    border-color: var(--purple);
+    background: linear-gradient(135deg, var(--salvia-light) 0%, #FFFFFF 100%);
+    border-color: var(--salvia);
 }
 
 .card-desc {
@@ -371,6 +371,22 @@ button {
     border: 1px solid var(--border);
     font-size: 10.5px;
     padding: 5px 10px;
+}
+
+/* ESTILOS DA FLORESTA MENTORII (ESTILO FOREST) */
+.tree-card {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 10px;
+    text-align: center;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.tree-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--salvia);
+    background: var(--salvia-light);
 }
 
 .sprint-box {

@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     renderSprintGoals();
     renderPriorityMatrix();
     renderWeeklyScheduleTable();
+    renderForestTrees();
     initCharts();
     setupEventListeners();
 });
@@ -69,6 +70,7 @@ function renderAllTabs() {
     renderSprintGoals();
     renderPriorityMatrix();
     renderWeeklyScheduleTable();
+    renderForestTrees();
     initCharts();
 }
 
@@ -103,6 +105,7 @@ window.switchTab = function(tabId, element) {
     if (tabId === 'tab-prioridades') renderPriorityMatrix();
     if (tabId === 'tab-cursos') renderActiveCourses();
     if (tabId === 'tab-incubadora') renderActiveCourses();
+    if (tabId === 'tab-floresta') renderForestTrees();
 };
 
 window.renderDashboard = function() {
@@ -180,6 +183,7 @@ function renderThreeFocusFrents() {
     });
 }
 
+// RENDERIZAÇÃO DO PET CUSTOMIZÁVEL
 window.renderPetStatus = function() {
     const rpg = MentoriiCore.state.rpg || {};
     const avatar = document.getElementById('pet-avatar');
@@ -188,9 +192,11 @@ window.renderPetStatus = function() {
     const statusDesc = document.getElementById('pet-status-desc');
 
     if (avatar) avatar.innerText = MentoriiCore.getPetAvatar();
-    if (title) title.innerText = rpg.petName || "Ovo Misterioso";
+    if (title) title.innerText = rpg.petName || "Meu Pet";
     if (speech) speech.innerText = `"${MentoriiCore.getPetSpeech()}"`;
-    if (statusDesc) statusDesc.innerText = `Estágio: ${(rpg.petStage || 'egg').toUpperCase()} | Nível: ${rpg.level || 1}`;
+    
+    const stageNames = { egg: "Ovo", baby: "Filhote", companion: "Companheiro", guardian: "Guardião" };
+    if (statusDesc) statusDesc.innerText = `Estágio: ${(stageNames[rpg.petStage] || 'Ovo').toUpperCase()} | Nível: ${rpg.level || 1}`;
 
     const lvlVal = document.getElementById('rpg-lvl-val');
     const xpVal = document.getElementById('rpg-xp-val');
@@ -203,6 +209,22 @@ window.renderPetStatus = function() {
     if (intVal) intVal.innerText = rpg.int || 0;
     if (strVal) strVal.innerText = rpg.str || 0;
     if (dexVal) dexVal.innerText = rpg.dex || 0;
+};
+
+window.customizePetModal = function() {
+    const currentName = MentoriiCore.state.rpg.petName || "Meu Pet";
+    const newName = prompt("Escolha o nome do seu Pet:", currentName);
+    if (!newName || !newName.trim()) return;
+
+    const newType = prompt("Escolha o tipo do Pet (cat, fox, owl, panda, robot):", MentoriiCore.state.rpg.petType || "cat");
+    if (['cat', 'fox', 'owl', 'panda', 'robot'].includes(newType)) {
+        MentoriiCore.state.rpg.petType = newType;
+    }
+
+    MentoriiCore.state.rpg.petName = newName.trim();
+    MentoriiCore.save();
+    renderPetStatus();
+    alert("🐾 Pet customizado com sucesso!");
 };
 
 window.renderActiveCourses = function() {
@@ -289,7 +311,7 @@ window.toggleCourseSubItem = function(courseId, itemId) {
             item.done = !item.done;
             if (item.done) MentoriiCore.addFP(10, "str");
             MentoriiCore.save();
-            renderDashboard();
+            renderDashboard(); // Recarrega para recalcular a porcentagem global imediatamente
         }
     }
 };
@@ -628,6 +650,7 @@ window.deleteExerciseFromNotebook = function(nbIdx, exIdx) {
     }
 };
 
+// POMODORO COM PAUSA E REGISTRO DE FLORESTA
 let pomoTimerInterval = null;
 
 window.togglePomodoro = function() {
@@ -641,6 +664,7 @@ window.togglePomodoro = function() {
     } else {
         pomo.isRunning = true;
         if (btn) btn.innerText = "⏸ Pausar";
+        
         pomoTimerInterval = setInterval(() => {
             if (pomo.timeRemaining > 0) {
                 pomo.timeRemaining--;
@@ -649,10 +673,22 @@ window.togglePomodoro = function() {
                 clearInterval(pomoTimerInterval);
                 pomo.isRunning = false;
                 if (btn) btn.innerText = "▶ Iniciar";
-                alert("⏱️ Ciclo de Foco Concluído! +15 FP.");
+                
+                // Concluiu com sucesso o ciclo de 25 min! Planta uma árvore na floresta
+                const taskName = pomo.currentTaskName || "Sessão de Foco";
+                if (!MentoriiCore.state.forest) MentoriiCore.state.forest = { trees: [] };
+                MentoriiCore.state.forest.trees.unshift({
+                    id: `tree_${Date.now()}`,
+                    name: taskName,
+                    date: new Date().toLocaleDateString('pt-BR'),
+                    icon: ['🌲', '🌳', '🌸', '🌲', '🌿'][Math.floor(Math.random() * 5)]
+                });
+
+                alert(`⏱️ Ciclo de Foco "${taskName}" Concluído!\n🌳 Uma nova árvore foi plantada na sua Floresta Mentorii! +15 FP.`);
                 MentoriiCore.addFP(15, "int");
                 pomo.timeRemaining = 25 * 60;
                 renderDashboard();
+                renderForestTrees();
             }
         }, 1000);
     }
@@ -674,6 +710,38 @@ window.updatePomodoroDisplay = function() {
     const s = (pomo.timeRemaining % 60).toString().padStart(2, '0');
     const display = document.getElementById('pomo-timer-display');
     if (display) display.innerText = `${m}:${s}`;
+};
+
+window.customizePomodoroActivity = function() {
+    const pomo = MentoriiCore.state.pomodoro;
+    const current = pomo.currentTaskName || "Estudo Focado";
+    const name = prompt("Nome da atividade em foco:", current);
+    if (name && name.trim()) {
+        pomo.currentTaskName = name.trim();
+        MentoriiCore.save();
+        const label = document.getElementById('pomo-active-task-label');
+        if (label) label.innerText = `Atividade: ${name.trim()}`;
+    }
+};
+
+// RENDERIZADOR DA FLORESTA MENTORII (ESTILO FOREST)
+window.renderForestTrees = function() {
+    const container = document.getElementById('forest-grid-container');
+    if (!container) return;
+
+    const trees = MentoriiCore.state.forest?.trees || [];
+    if (trees.length === 0) {
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:var(--text-dim); padding:30px; font-family:var(--mono);">Sua floresta está vazia. Conclua ciclos no Relógio Pomodoro para plantar suas primeiras árvores! 🌲</div>`;
+        return;
+    }
+
+    container.innerHTML = trees.map(t => `
+        <div class="tree-card" style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--radius-md); padding:12px; text-align:center;">
+            <div style="font-size:38px; margin-bottom:4px;">${t.icon}</div>
+            <div style="font-family:var(--mono); font-size:11px; font-weight:bold; color:var(--text);">${t.name}</div>
+            <div style="font-family:var(--mono); font-size:9.5px; color:var(--text-dim); margin-top:2px;">Plantada em ${t.date}</div>
+        </div>
+    `).join('');
 };
 
 window.completeCurrentDailyTask = function() {
@@ -1325,6 +1393,8 @@ let weeklyBarChartInstance = null;
 let distributionDoughnutInstance = null;
 
 function initCharts() {
+    if (typeof Chart === 'undefined') return;
+
     const barCtx = document.getElementById('weeklyBarChart')?.getContext('2d');
     const donutCtx = document.getElementById('distributionDoughnutChart')?.getContext('2d');
 

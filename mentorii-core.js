@@ -1,5 +1,5 @@
 /* ============================================================ */
-/* MENTORII — CORE MULTI-USUÁRIO PRIVADO & LIMPO                */
+/* MENTORII — CORE MULTI-USUÁRIO PRIVADO & RPG CONFIGURÁVEL     */
 /* ============================================================ */
 
 const MentoriiCore = {
@@ -19,7 +19,8 @@ const MentoriiCore = {
             sprints: [],
             habits: [],
             rpg: {
-                petName: "Ovo Misterioso",
+                petName: "Meu Pet de Foco",
+                petType: "cat", // 'cat', 'fox', 'owl', 'panda', 'robot'
                 petStage: "egg",
                 level: 1,
                 fp: 0,
@@ -27,10 +28,14 @@ const MentoriiCore = {
                 str: 0,
                 dex: 0
             },
+            forest: {
+                trees: [] // Lista de árvores plantadas ao concluir ciclos Pomodoro
+            },
             pomodoro: {
                 mode: "foco",
                 timeRemaining: 25 * 60,
-                isRunning: false
+                isRunning: false,
+                currentTaskName: "Estudo Focado"
             },
             streakDays: 1,
             classSchedule: [],
@@ -51,6 +56,8 @@ const MentoriiCore = {
 
         if (this.currentUserKey && usersDB[this.currentUserKey]) {
             this.state = usersDB[this.currentUserKey];
+            if (!this.state.forest) this.state.forest = { trees: [] };
+            if (!this.state.rpg.petType) this.state.rpg.petType = "cat";
         } else {
             if (window.location.pathname.includes('index.html')) {
                 const keys = Object.keys(usersDB);
@@ -63,7 +70,7 @@ const MentoriiCore = {
     },
 
     getAllUsersDB: function() {
-        const raw = localStorage.getItem('mentorii_users_db_v19');
+        const raw = localStorage.getItem('mentorii_users_db_v20');
         if (raw) {
             try { return JSON.parse(raw); } catch (e) {}
         }
@@ -72,7 +79,7 @@ const MentoriiCore = {
 
     saveAllUsersDB: function(db) {
         try {
-            localStorage.setItem('mentorii_users_db_v19', JSON.stringify(db));
+            localStorage.setItem('mentorii_users_db_v20', JSON.stringify(db));
         } catch (e) {
             console.error("Erro ao salvar banco de usuários:", e);
         }
@@ -84,7 +91,6 @@ const MentoriiCore = {
         usersDB[this.currentUserKey] = this.state;
         this.saveAllUsersDB(usersDB);
         
-        // Dispara feedback visual discreto de salvamento se houver elemento na UI
         const indicator = document.getElementById('sync-status-indicator');
         if (indicator) {
             indicator.innerText = "💾 Salvo localmente";
@@ -128,7 +134,7 @@ const MentoriiCore = {
 
     addFP: function(amount, stat) {
         if (!this.state.rpg) {
-            this.state.rpg = { petName: "Ovo Misterioso", petStage: "egg", level: 1, fp: 0, int: 0, str: 0, dex: 0 };
+            this.state.rpg = { petName: "Meu Pet", petType: "cat", petStage: "egg", level: 1, fp: 0, int: 0, str: 0, dex: 0 };
         }
         this.state.rpg.fp += amount;
         
@@ -143,34 +149,38 @@ const MentoriiCore = {
 
         if (progressPct === 0) {
             this.state.rpg.petStage = "egg";
-            this.state.rpg.petName = "Ovo Misterioso";
         } else if (progressPct > 0 && progressPct <= 35) {
             this.state.rpg.petStage = "baby";
-            this.state.rpg.petName = "Gatinho Aprendiz";
         } else if (progressPct > 35 && progressPct <= 75) {
             this.state.rpg.petStage = "companion";
-            this.state.rpg.petName = "Raposa Companheira";
         } else {
             this.state.rpg.petStage = "guardian";
-            this.state.rpg.petName = "Dragão Guardião";
         }
     },
 
     getPetAvatar: function() {
+        const type = this.state.rpg?.petType || "cat";
         const stage = this.state.rpg?.petStage || "egg";
+        
         if (stage === "egg") return "🥚";
-        if (stage === "baby") return "🐱";
-        if (stage === "companion") return "🦊";
-        if (stage === "guardian") return "🐉";
-        return "🥚";
+
+        const avatars = {
+            cat: { baby: "🐱", companion: "😺", guardian: "🐅" },
+            fox: { baby: "🦊", companion: "🐺", guardian: "🦊✨" },
+            owl: { baby: "🦉", companion: "🦅", guardian: "🕊️" },
+            panda: { baby: "🐼", companion: "🐨", guardian: "🎋" },
+            robot: { baby: "🤖", companion: "🦾", guardian: "⚡" }
+        };
+
+        return avatars[type]?.[stage] || "🐱";
     },
 
     getPetSpeech: function() {
         const stage = this.state.rpg?.petStage || "egg";
         if (stage === "egg") return "Estou aquecendo no ninho... Conclua módulos para me fazer chocar!";
-        if (stage === "baby") return "Miau! Já sou um Gatinho Aprendiz. Continue avançando!";
-        if (stage === "companion") return "Excelente ritmo! Juntos como uma Raposa Companheira.";
-        return "Poder total desbloqueado! Dragão Guardião ativo!";
+        if (stage === "baby") return "Estou crescendo! Continue avançando nos estudos.";
+        if (stage === "companion") return "Excelente ritmo! Estamos evoluindo juntos.";
+        return "Poder total desbloqueado! Foco absoluto alcançado!";
     }
 };
 

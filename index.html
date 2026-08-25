@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- IMPORTANTE: Biblioteca Chart.js necessária para os gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -18,7 +17,7 @@
             <div>
                 <div class="eyebrow">Career Operating System</div>
                 <h1>Painel Mentorii — Cockpit Inteligente</h1>
-                <p class="topbar-description" id="user-pdi-desc">Com Oráculo de Decisão, Pomodoro, Notebook Organizador, Hábitos e RPG.</p>
+                <p class="topbar-description" id="user-pdi-desc">Com Oráculo de Decisão, Pomodoro, Mascote Tamagotchi e Floresta Viva.</p>
                 <div style="margin-top:6px; font-size:11px; font-family:var(--mono); color:var(--text-dim); display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                     <span>📂 Fonte: <span id="topbar-pdi-source" style="color:var(--purple); font-weight:bold;">Nenhum PDI importado</span></span>
                     <span>|</span>
@@ -46,14 +45,14 @@
             <div class="streak-badge" id="streak-counter-badge">🔥 1 Dias Ativos</div>
         </div>
 
-        <!-- 13 TABS NAVIGATION -->
+        <!-- NAVIGATION TABS -->
         <nav class="nav-tabs">
-            <button type="button" class="tab-btn active" onclick="switchTab('tab-importar', this)">📥 Importar PDI & JSON</button>
+            <button type="button" class="tab-btn active" onclick="switchTab('tab-importar', this)">📥 Importar PDI & Prompt IA</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-foco', this)">🎯 Foco & Pomodoro</button>
+            <button type="button" class="tab-btn" onclick="switchTab('tab-mentorii-lab', this)">🐾 Mascote & Mundo (Tamagotchi)</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-prioridades', this)">★ Prioridades & Estágio</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-diario', this)">📋 Diário de Progresso</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-notebook', this)">📓 Notebook Técnico</button>
-            <button type="button" class="tab-btn" onclick="switchTab('tab-mentorii-lab', this)">🐾 Mentorii RPG</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-habitos', this)">🌸 Hábitos</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-graficos', this)">📊 Gráficos</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-cursos', this)">📚 Cursos & Módulos</button>
@@ -63,33 +62,69 @@
             <button type="button" class="tab-btn" onclick="switchTab('tab-agenda', this)">📆 Agenda</button>
         </nav>
 
-        <!-- ABA 0: IMPORTAR PDI & JSON (DEDICADA) -->
+        <!-- ABA 0: IMPORTAR PDI & PROMPT MESTRE DE IA -->
         <section id="tab-importar" class="tab-content active">
-            <div class="card card-purple-border">
-                <div class="flex-between mb-16">
-                    <div>
-                        <span class="eyebrow">📥 Importação Direta e Universal</span>
-                        <h3>Carregar Arquivo ou Colar PDI/JSON</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                <div class="card card-purple-border" style="margin-bottom:0;">
+                    <div class="flex-between mb-16">
+                        <div>
+                            <span class="eyebrow">📥 Importação Universal</span>
+                            <h3>Carregar Arquivo ou Colar JSON</h3>
+                        </div>
+                    </div>
+                    <p class="card-desc">Carregue um arquivo `.json` ou cole o PDI estruturado diretamente aqui.</p>
+
+                    <div style="background:var(--bg-subtle); border:1px dashed var(--purple); padding:12px; border-radius:var(--radius-sm); margin-bottom:14px;">
+                        <span style="font-size:11px; font-family:var(--mono); font-weight:bold; color:var(--purple); display:block; margin-bottom:6px;">📄 ARQUIVO DO COMPUTADOR (.JSON):</span>
+                        <input type="file" id="pdi-file-input-element" accept=".json,.txt,.html" onchange="handleFileSelected(event)" style="font-family:var(--mono); font-size:11px; padding:6px; background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius-sm); width:100%; cursor:pointer;">
+                    </div>
+
+                    <div style="background:var(--bg-subtle); border:1px solid var(--border); padding:12px; border-radius:var(--radius-sm);">
+                        <span style="font-size:11px; font-family:var(--mono); font-weight:bold; color:var(--text); display:block; margin-bottom:6px;">📋 OU COLE O JSON AQUI COMO TEXTO:</span>
+                        <textarea id="paste-pdi-json-input" class="input-text" style="width:100%; height:120px; font-family:var(--mono); font-size:11px; padding:8px;" placeholder="Cole aqui seu JSON..."></textarea>
+                        <button type="button" onclick="handleApplyPastedPDI()" class="btn-action" style="width:100%; margin-top:10px; padding:10px; font-size:11.5px;">✓ Processar & Aplicar ao Cockpit</button>
+                    </div>
+
+                    <div id="pdi-file-status-box" style="display:none; background:var(--bg-card); border:1px solid var(--purple); padding:8px 12px; border-radius:var(--radius-sm); margin-top:12px; align-items:center; justify-content:space-between; gap:8px;">
+                        <div style="font-size:11px; font-family:var(--mono); color:var(--purple); font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            📌 Indexado: <span id="pdi-filename-label" style="text-decoration:underline;">Nenhum</span>
+                        </div>
+                        <button type="button" class="btn-backup" style="font-size:10px; padding:3px 6px; color:var(--red);" onclick="clearIndexedPDI()">❌ Limpar</button>
                     </div>
                 </div>
-                <p class="card-desc">Utilize esta área para carregar o seu plano de estudos em formato JSON ou colar o conteúdo do PDI diretamente como texto.</p>
 
-                <div style="background:var(--bg-subtle); border:1px dashed var(--purple); padding:16px; border-radius:var(--radius-sm); margin-bottom:20px;">
-                    <span style="font-size:12px; font-family:var(--mono); font-weight:bold; color:var(--purple); display:block; margin-bottom:8px;">📄 CARREGAR ARQUIVO DO COMPUTADOR (.JSON / .TXT):</span>
-                    <input type="file" id="pdi-file-input-element" accept=".json,.txt,.html" onchange="handleFileSelected(event)" style="font-family:var(--mono); font-size:12px; padding:8px; background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius-sm); width:100%; cursor:pointer;">
-                </div>
-
-                <div style="background:var(--bg-subtle); border:1px solid var(--border); padding:16px; border-radius:var(--radius-sm);">
-                    <span style="font-size:12px; font-family:var(--mono); font-weight:bold; color:var(--text); display:block; margin-bottom:8px;">📋 OU COLE SEU PDI / JSON AQUI COMO TEXTO:</span>
-                    <textarea id="paste-pdi-json-input" class="input-text" style="width:100%; height:180px; font-family:var(--mono); font-size:12px; padding:12px;" placeholder="Cole aqui seu JSON estruturado (ex: PDI do Lucas Rocha) ou tópicos de PDI..."></textarea>
-                    <button type="button" onclick="handleApplyPastedPDI()" class="btn-action" style="width:100%; margin-top:12px; padding:12px; font-size:12px;">✓ Processar & Aplicar ao Cockpit</button>
-                </div>
-
-                <div id="pdi-file-status-box" style="display:none; background:var(--bg-card); border:1px solid var(--purple); padding:10px 14px; border-radius:var(--radius-sm); margin-top:16px; align-items:center; justify-content:space-between; gap:8px;">
-                    <div style="font-size:12px; font-family:var(--mono); color:var(--purple); font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                        📌 Fonte Indexada: <span id="pdi-filename-label" style="text-decoration:underline;">Nenhum</span>
+                <div class="card card-purple-border" style="margin-bottom:0;">
+                    <div class="flex-between mb-16">
+                        <div>
+                            <span class="eyebrow">✨ Alternativa com IA Externa</span>
+                            <h3>Prompt Mestre para Gerar PDI</h3>
+                        </div>
                     </div>
-                    <button type="button" class="btn-backup" style="font-size:11px; padding:4px 8px; color:var(--red);" onclick="clearIndexedPDI()">❌ Limpar Dados</button>
+                    <p class="card-desc">Copie o prompt abaixo, cole na sua IA de preferência (como o Gemini) para gerar um PDI estruturado em JSON pronto para importação!</p>
+
+                    <div style="background:var(--bg-subtle); border:1px solid var(--border); padding:10px; border-radius:var(--radius-sm); font-family:var(--mono); font-size:10.5px; white-space:pre-wrap; line-height:1.4; height:180px; overflow-y:auto; margin-bottom:10px;" id="master-prompt-text">Ate para criar um PDI e metas de estudo de alta performance, atue como um Arquiteto de Carreira e Especialista em Aprendizagem Acelerada. 
+
+Por favor, faça-me as seguintes 4 perguntas de diagnóstico para entender meu perfil:
+1. Qual é a sua meta principal exata de longo prazo?
+2. Qual é o seu nível atual de conhecimento no assunto?
+3. Quantas horas por semana você tem disponíveis?
+4. Quais são suas maiores dificuldades (foco cirúrgico)?
+
+Com base nas minhas respostas, gere rigorosamente um arquivo JSON no seguinte formato estruturado para o sistema Mentorii:
+{
+  "profile": {
+    "targetGoal": "Sua Meta Principal",
+    "surgeryFocus": "Seu Foco Cirúrgico"
+  },
+  "cards": [
+    {
+      "nome": "1. Nome da Frente",
+      "categoria": "Core",
+      "modulos": ["Módulo 1", "Módulo 2"]
+    }
+  ]
+}</div>
+                    <button type="button" class="btn-action" style="width:100%; padding:10px; font-size:11.5px;" onclick="navigator.clipboard.writeText(document.getElementById('master-prompt-text').innerText); alert('📋 Prompt Mestre copiado com sucesso! Cole na sua IA favorita.');">📋 Copiar Prompt Mestre</button>
                 </div>
             </div>
         </section>
@@ -119,12 +154,16 @@
                 </div>
 
                 <div class="pomodoro-box">
-                    <div class="pomodoro-title">⏱️ Relógio Pomodoro</div>
+                    <div class="pomodoro-title">⏱️ Relógio Pomodoro & Floresta</div>
+                    <div style="font-size:11px; font-family:var(--mono); color:var(--purple); margin:4px 0; font-weight:bold;" id="pomo-active-task-label">Atividade: Estudo Focado</div>
                     <div class="pomodoro-display" id="pomo-timer-display">25:00</div>
                     <div class="pomodoro-cycles" id="pomo-mode-status">🎯 MODO FOCO</div>
-                    <div class="pomodoro-btns">
-                        <button type="button" class="btn-pomo" id="btn-pomo-toggle" onclick="togglePomodoro()">▶ Iniciar</button>
-                        <button type="button" class="btn-pomo" onclick="resetPomodoroSequence()">🔄 Resetar</button>
+                    <div class="pomodoro-btns" style="display:flex; flex-direction:column; gap:4px;">
+                        <div style="display:flex; gap:4px; justify-content:center;">
+                            <button type="button" class="btn-pomo" id="btn-pomo-toggle" onclick="togglePomodoro()">▶ Iniciar</button>
+                            <button type="button" class="btn-pomo" onclick="resetPomodoroSequence()">🔄 Resetar</button>
+                        </div>
+                        <button type="button" class="btn-backup" style="font-size:10px; padding:3px;" onclick="customizePomodoroActivity()">✏️ Personalizar Atividade</button>
                     </div>
                 </div>
             </div>
@@ -139,6 +178,54 @@
 
             <span class="section-subtitle">As 3 Frentes de Execução Imediata (Extraídas do PDI)</span>
             <section class="priority-grid" id="three-focus-frents-grid"></section>
+        </section>
+
+        <!-- ABA MENTORII RPG & FLORESTA INTEGRADA (TAMAGOTCHI DO MUNDO DO PET) -->
+        <section id="tab-mentorii-lab" class="tab-content">
+            <div class="card card-purple-gradient">
+                <div class="flex-between">
+                    <div>
+                        <span class="eyebrow">🐾 Ecossistema Tamagotchi & Floresta Viva</span>
+                        <h2>O Mundo do seu Mascote</h2>
+                    </div>
+                    <div class="text-right">
+                        <div class="readiness-score-val" id="readiness-score-text">0%</div>
+                        <div class="readiness-rank" id="readiness-rank-title">Prontidão Geral</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mentorii-world-container" style="margin-bottom:16px;">
+                <div id="pet-avatar" style="font-size: 72px; margin: 8px 0; user-select:none; line-height:1;">🥚</div>
+                <h2 id="pet-name-title">Meu Pet</h2>
+                <div class="pet-speech-bubble" id="pet-speech-text">
+                    "Estou aquecendo no ninho... Conclua módulos para me fazer chocar!"
+                </div>
+                <div class="pet-status" id="pet-status-desc" style="margin-bottom:10px;">
+                    Estágio: OVO | Nível: 1
+                </div>
+                <button type="button" class="btn-action" onclick="customizePetModal()" style="margin-bottom:14px;">✏️ Personalizar Nome e Espécie do Pet</button>
+
+                <div class="rpg-stats-grid">
+                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-lvl-val">1</div><div class="attr-lbl">Nível</div></div>
+                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-xp-val">0</div><div class="attr-lbl">FP (Focus)</div></div>
+                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-int-val">0</div><div class="attr-lbl">🔬 INT</div></div>
+                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-str-val">0</div><div class="attr-lbl">💻 STR</div></div>
+                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-dex-val">0</div><div class="attr-lbl">🧠 DEX</div></div>
+                </div>
+            </div>
+
+            <!-- Bosque / Floresta do Pet integrado na mesma aba -->
+            <div class="card" style="border-color:var(--salvia);">
+                <div class="flex-between mb-16">
+                    <div>
+                        <span class="eyebrow" style="color:var(--salvia);">🌲 O Bosque do Mascote (Floresta Estilo Forest)</span>
+                        <h3>Árvores Cultivadas pelo Foco nos Estudos</h3>
+                    </div>
+                </div>
+                <p class="card-desc">Cada ciclo Pomodoro concluído cultiva uma nova árvore no habitat do seu pet, expandindo o mundo dele!</p>
+                <div id="forest-grid-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; margin-top:12px;"></div>
+            </div>
         </section>
 
         <!-- ABA 2: PRIORIDADES & ESTÁGIO -->
@@ -239,42 +326,6 @@
             </div>
         </section>
 
-        <!-- ABA 5: MENTORII RPG & TAMAGOTCHI -->
-        <section id="tab-mentorii-lab" class="tab-content">
-            <div class="card card-purple-gradient">
-                <div class="flex-between">
-                    <div>
-                        <span class="eyebrow">🎯 Career Readiness Score</span>
-                        <h2>Prontidão & Nível de Evolução</h2>
-                    </div>
-                    <div class="text-right">
-                        <div class="readiness-score-val" id="readiness-score-text">0%</div>
-                        <div class="readiness-rank" id="readiness-rank-title">Rank: Novato</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mentorii-world-container">
-                <span class="eyebrow">🐾 Mentorii Companheiro Vivo</span>
-                <div id="pet-avatar" style="font-size: 72px; margin: 12px 0; user-select:none; line-height:1;">🥚</div>
-                <h2 id="pet-name-title">Ovo Misterioso</h2>
-                <div class="pet-speech-bubble" id="pet-speech-text">
-                    "Estou aquecendo no ninho... Conclua módulos para me fazer chocar!"
-                </div>
-                <div class="pet-status" id="pet-status-desc">
-                    Estágio: OVO | Nível: 1
-                </div>
-
-                <div class="rpg-stats-grid">
-                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-lvl-val">1</div><div class="attr-lbl">Nível</div></div>
-                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-xp-val">0</div><div class="attr-lbl">FP (Focus Points)</div></div>
-                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-int-val">0</div><div class="attr-lbl">🔬 INT</div></div>
-                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-str-val">0</div><div class="attr-lbl">💻 STR</div></div>
-                    <div class="rpg-stat-card"><div class="attr-val" id="rpg-dex-val">0</div><div class="attr-lbl">🧠 DEX</div></div>
-                </div>
-            </div>
-        </section>
-
         <!-- ABA 6: HÁBITOS -->
         <section id="tab-habitos" class="tab-content">
             <div class="habit-tracker-container">
@@ -329,7 +380,7 @@
                 <div class="flex-between mb-16">
                     <div>
                         <h3>🎓 Grade Curricular Semanal (Matriz Interativa)</h3>
-                        <p style="font-size:12px; color:var(--text-dim);">Clique em qualquer quadrado da tabela abaixo para editar cirurgicamente o compromisso daquele dia e horário específico.</p>
+                        <p style="font-size:12px; color:var(--text-dim);">Clique em qualquer quadrado da tabela abaixo para editar cirurgicamente a atividade daquele dia e horário específico.</p>
                     </div>
                     <button type="button" class="btn-action" onclick="openScheduleModal()">+ Adicionar Faixa Horária</button>
                 </div>
