@@ -5,31 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentorii — Career Operating System Cockpit</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-    <link href="[https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap)" rel="stylesheet">
-    <script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- IMPORTANTE: Biblioteca Chart.js necessária para os gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
     <main class="app">
+        <!-- TOPBAR -->
         <header class="topbar">
             <div>
                 <div class="eyebrow">Career Operating System</div>
                 <h1>Painel Mentorii — Cockpit Inteligente</h1>
-                <p class="topbar-description" id="user-pdi-desc">Com Oráculo de Decisão Local, Importador PDI / Trello, Pomodoro, Notebook Organizador e RPG.</p>
-                <div style="margin-top:6px; font-size:11px; font-family:var(--mono); color:var(--text-dim);">
-                    📂 Fonte Ativa: <span id="topbar-pdi-source" style="color:var(--purple); font-weight:bold;">PDI Padrão / Configuração Manual</span>
+                <p class="topbar-description" id="user-pdi-desc">Com Oráculo de Decisão, Pomodoro, Notebook Organizador, Hábitos e RPG.</p>
+                <div style="margin-top:6px; font-size:11px; font-family:var(--mono); color:var(--text-dim); display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <span>📂 Fonte: <span id="topbar-pdi-source" style="color:var(--purple); font-weight:bold;">Nenhum PDI importado</span></span>
+                    <span>|</span>
+                    <span>Perfil Privado Ativo: 
+                        <select id="user-profile-selector" class="select-priority" onchange="onUserSelectChange(this)" style="padding:2px 6px; font-size:11px;">
+                        </select>
+                    </span>
+                    <span>|</span>
+                    <span id="sync-status-indicator" style="color:var(--salvia); font-weight:bold;">🔒 Seguro</span>
                 </div>
             </div>
             <div class="header-actions">
-                <button type="button" class="btn-backup" onclick="exportBackupJSON()">💾 Exportar Backup</button>
-                <button type="button" class="btn-backup" onclick="document.getElementById('import-json-file').click()">📂 Importar Backup</button>
-                <input type="file" id="import-json-file" style="display:none" onchange="importBackupJSON(event)">
-                <button type="button" class="btn-action" onclick="openOnboardingModal()">⚙️ Configurar / Importar PDI</button>
-                <button type="button" class="btn-reset" onclick="logoutUser()">🚪 Sair</button>
+                <button type="button" class="btn-backup" onclick="exportBackupJSON()">💾 Exportar PDI</button>
+                <button type="button" class="btn-action" onclick="openOnboardingModal()">⚙️ Configurar Perfil</button>
+                <button type="button" class="btn-reset" onclick="resetAllAppData()">🔄 Resetar Perfil</button>
             </div>
         </header>
 
+        <!-- GLOBAL PROGRESS BAR -->
         <div class="global-progress-box">
             <div class="global-progress-info" id="global-progress-text">Evolução Global: 0%</div>
             <div class="global-progress-bar-bg">
@@ -38,8 +46,10 @@
             <div class="streak-badge" id="streak-counter-badge">🔥 1 Dias Ativos</div>
         </div>
 
+        <!-- 13 TABS NAVIGATION -->
         <nav class="nav-tabs">
-            <button type="button" class="tab-btn active" onclick="switchTab('tab-foco', this)">🎯 Foco & Pomodoro</button>
+            <button type="button" class="tab-btn active" onclick="switchTab('tab-importar', this)">📥 Importar PDI & JSON</button>
+            <button type="button" class="tab-btn" onclick="switchTab('tab-foco', this)">🎯 Foco & Pomodoro</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-prioridades', this)">★ Prioridades & Estágio</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-diario', this)">📋 Diário de Progresso</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-notebook', this)">📓 Notebook Técnico</button>
@@ -48,13 +58,44 @@
             <button type="button" class="tab-btn" onclick="switchTab('tab-graficos', this)">📊 Gráficos</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-cursos', this)">📚 Cursos & Módulos</button>
             <button type="button" class="tab-btn tab-backlog" onclick="switchTab('tab-incubadora', this)">📦 Incubadora</button>
-            <button type="button" class="tab-btn" onclick="switchTab('tab-grade', this)">🎓 Grade Horária</button>
+            <button type="button" class="tab-btn" onclick="switchTab('tab-grade', this)">🎓 Grade Curricular</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-tarefas', this)">📌 Tarefas & Prazos</button>
             <button type="button" class="tab-btn" onclick="switchTab('tab-agenda', this)">📆 Agenda</button>
         </nav>
 
+        <!-- ABA 0: IMPORTAR PDI & JSON (DEDICADA) -->
+        <section id="tab-importar" class="tab-content active">
+            <div class="card card-purple-border">
+                <div class="flex-between mb-16">
+                    <div>
+                        <span class="eyebrow">📥 Importação Direta e Universal</span>
+                        <h3>Carregar Arquivo ou Colar PDI/JSON</h3>
+                    </div>
+                </div>
+                <p class="card-desc">Utilize esta área para carregar o seu plano de estudos em formato JSON ou colar o conteúdo do PDI diretamente como texto.</p>
+
+                <div style="background:var(--bg-subtle); border:1px dashed var(--purple); padding:16px; border-radius:var(--radius-sm); margin-bottom:20px;">
+                    <span style="font-size:12px; font-family:var(--mono); font-weight:bold; color:var(--purple); display:block; margin-bottom:8px;">📄 CARREGAR ARQUIVO DO COMPUTADOR (.JSON / .TXT):</span>
+                    <input type="file" id="pdi-file-input-element" accept=".json,.txt,.html" onchange="handleFileSelected(event)" style="font-family:var(--mono); font-size:12px; padding:8px; background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius-sm); width:100%; cursor:pointer;">
+                </div>
+
+                <div style="background:var(--bg-subtle); border:1px solid var(--border); padding:16px; border-radius:var(--radius-sm);">
+                    <span style="font-size:12px; font-family:var(--mono); font-weight:bold; color:var(--text); display:block; margin-bottom:8px;">📋 OU COLE SEU PDI / JSON AQUI COMO TEXTO:</span>
+                    <textarea id="paste-pdi-json-input" class="input-text" style="width:100%; height:180px; font-family:var(--mono); font-size:12px; padding:12px;" placeholder="Cole aqui seu JSON estruturado (ex: PDI do Lucas Rocha) ou tópicos de PDI..."></textarea>
+                    <button type="button" onclick="handleApplyPastedPDI()" class="btn-action" style="width:100%; margin-top:12px; padding:12px; font-size:12px;">✓ Processar & Aplicar ao Cockpit</button>
+                </div>
+
+                <div id="pdi-file-status-box" style="display:none; background:var(--bg-card); border:1px solid var(--purple); padding:10px 14px; border-radius:var(--radius-sm); margin-top:16px; align-items:center; justify-content:space-between; gap:8px;">
+                    <div style="font-size:12px; font-family:var(--mono); color:var(--purple); font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        📌 Fonte Indexada: <span id="pdi-filename-label" style="text-decoration:underline;">Nenhum</span>
+                    </div>
+                    <button type="button" class="btn-backup" style="font-size:11px; padding:4px 8px; color:var(--red);" onclick="clearIndexedPDI()">❌ Limpar Dados</button>
+                </div>
+            </div>
+        </section>
+
         <!-- ABA 1: FOCO & POMODORO -->
-        <section id="tab-foco" class="tab-content active">
+        <section id="tab-foco" class="tab-content">
             <div class="oracle-card">
                 <div class="oracle-header">
                     <span class="oracle-title">🔮 Oráculo do Dia (Diagnóstico Inteligente)</span>
@@ -68,12 +109,12 @@
                 <div>
                     <div class="daily-focus-header">
                         <span class="daily-focus-tag">⚡ Foco do Dia</span>
-                        <span class="category-tag" id="daily-focus-category">Estudos / Execução</span>
+                        <span class="category-tag" id="daily-focus-category">Execução Principal</span>
                     </div>
                     <div class="daily-focus-task" id="daily-focus-task-text">Avançar Bloco de Estudos e Resolução Solo</div>
                     <div class="daily-focus-actions">
-                        <button type="button" class="btn-complete-task" onclick="completeCurrentDailyTask()">✓ Concluir e Avançar XP</button>
-                        <button type="button" class="btn-skip-task" onclick="skipCurrentDailyTask()">⏭️ Pular</button>
+                        <button type="button" class="btn-complete-task" onclick="completeCurrentDailyTask()">✓ Concluir e Avançar XP (+15 FP)</button>
+                        <button type="button" class="btn-skip-task" onclick="skipCurrentDailyTask()">⏭️ Próxima Tarefa</button>
                     </div>
                 </div>
 
@@ -82,8 +123,7 @@
                     <div class="pomodoro-display" id="pomo-timer-display">25:00</div>
                     <div class="pomodoro-cycles" id="pomo-mode-status">🎯 MODO FOCO</div>
                     <div class="pomodoro-btns">
-                        <button type="button" class="btn-pomo" onclick="startPomodoro()">▶ Iniciar</button>
-                        <button type="button" class="btn-pomo" onclick="pausePomodoro()">⏸ Pausar</button>
+                        <button type="button" class="btn-pomo" id="btn-pomo-toggle" onclick="togglePomodoro()">▶ Iniciar</button>
                         <button type="button" class="btn-pomo" onclick="resetPomodoroSequence()">🔄 Resetar</button>
                     </div>
                 </div>
@@ -92,19 +132,13 @@
             <div class="sprint-box">
                 <div class="sprint-header">
                     <span class="section-subtitle">🎯 Sprint da Semana (Metas Operacionais)</span>
-                    <button type="button" class="btn-add" onclick="addSprintGoal()">+ Adicionar Meta Semanal</button>
+                    <button type="button" class="btn-add" onclick="addNewSprintGoal()">+ Adicionar Meta Semanal</button>
                 </div>
                 <ul class="sprint-list" id="sprint-goals-list"></ul>
             </div>
 
             <span class="section-subtitle">As 3 Frentes de Execução Imediata (Extraídas do PDI)</span>
             <section class="priority-grid" id="three-focus-frents-grid"></section>
-
-            <div class="flex-between mb-16" style="margin-top:20px;">
-                <span class="section-subtitle">Disciplinas em Execução (Grade Ativa)</span>
-                <button type="button" class="btn-action" onclick="addNewCourse('active')">+ Adicionar Disciplina / Frente</button>
-            </div>
-            <div id="active-courses-module-container" class="course-grid"></div>
         </section>
 
         <!-- ABA 2: PRIORIDADES & ESTÁGIO -->
@@ -112,8 +146,8 @@
             <div class="priority-hero">
                 <div class="card priority-main">
                     <div class="priority-label" id="user-profile-type">PERFIL SELECIONADO</div>
-                    <h3 id="user-pdi-title">Minha Meta Principal</h3>
-                    <p id="user-pdi-surgery-desc">Foco total em consolidação técnica e prática solo de exercícios.</p>
+                    <h3 id="user-pdi-title">Defina sua Meta Principal</h3>
+                    <p id="user-pdi-surgery-desc">Defina suas fraquezas e pontos de atenção para cálculo estratégico.</p>
                 </div>
                 <div class="card priority-score">
                     <div class="priority-score-inner">
@@ -141,6 +175,7 @@
                 <div class="diary-groups" id="diary-groups"></div>
             </div>
 
+            <div class="section-subtitle mt-16">Detalhamento dos Módulos em Execução</div>
             <div id="diary-list"></div>
         </section>
 
@@ -154,7 +189,6 @@
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button type="button" class="btn-action" onclick="createNewNotebook()">+ Criar Novo Caderno</button>
-                        <button type="button" class="btn-add" onclick="openExerciseModal()">+ Registrar Exercício</button>
                     </div>
                 </div>
             </div>
@@ -162,10 +196,14 @@
             <div id="custom-notebook-cards-container"></div>
 
             <div class="card">
-                <span class="eyebrow">💼 Registro de Entregas & Projetos</span>
-                <p class="card-desc">Registre entregas concretas de código, provas ou simulados.</p>
+                <div class="flex-between">
+                    <div>
+                        <span class="eyebrow">💼 Registro de Entregas & Projetos</span>
+                        <p class="card-desc">Registre entregas concretas de código, provas ou simulados.</p>
+                    </div>
+                </div>
                 <div class="add-task-form">
-                    <input type="text" id="ev-title" class="input-text" placeholder="Ex: Módulo Concluído / Simulado Realizado">
+                    <input type="text" id="ev-title" class="input-text" placeholder="Ex: Módulo / Simulado Finalizado">
                     <input type="text" id="ev-link" class="input-text" placeholder="Link de Referência / GitHub">
                     <button type="button" class="btn-action" onclick="addEvidence()">Registrar Prova</button>
                 </div>
@@ -188,9 +226,14 @@
                 <span class="eyebrow">🚫 Modo SEM IA (Lógica Pura)</span>
                 <p class="card-desc">Valide sua autonomia resolvendo problemas de forma solo.</p>
                 <div class="add-task-form">
-                    <input type="text" id="noai-problem" class="input-text" placeholder="Ex: Questão de Prova / Exercício">
+                    <input type="text" id="noai-problem" class="input-text" placeholder="Ex: Questão / Exercício Solo">
                     <input type="number" id="noai-minutes" class="input-text max-w-120" placeholder="Minutos">
-                    <button type="button" class="btn-action" onclick="registerNoAITraining()">✓ Validar Solo</button>
+                    <select id="noai-diff" class="select-priority">
+                        <option value="Tranquilo">Tranquilo</option>
+                        <option value="Médio" selected>Médio</option>
+                        <option value="Desafiador">Desafiador</option>
+                    </select>
+                    <button type="button" class="btn-action" onclick="registerNoAITraining()">✓ Validar Solo (+20 FP)</button>
                 </div>
                 <div id="noai-history-list" class="mt-16"></div>
             </div>
@@ -213,13 +256,13 @@
 
             <div class="mentorii-world-container">
                 <span class="eyebrow">🐾 Mentorii Companheiro Vivo</span>
-                <div id="pet-avatar" style="font-size: 64px; margin: 12px 0; user-select:none;">🥚</div>
+                <div id="pet-avatar" style="font-size: 72px; margin: 12px 0; user-select:none; line-height:1;">🥚</div>
                 <h2 id="pet-name-title">Ovo Misterioso</h2>
                 <div class="pet-speech-bubble" id="pet-speech-text">
-                    "Pronto para os blocos de estudo de hoje?"
+                    "Estou aquecendo no ninho... Conclua módulos para me fazer chocar!"
                 </div>
                 <div class="pet-status" id="pet-status-desc">
-                    Estágio: OVO
+                    Estágio: OVO | Nível: 1
                 </div>
 
                 <div class="rpg-stats-grid">
@@ -237,17 +280,18 @@
             <div class="habit-tracker-container">
                 <div class="flex-between">
                     <h2 class="section-title-mono">🌸 Rastreamento de Hábitos Diários</h2>
-                    <span class="habit-consistency" id="habit-consistency-text">Consistência do Mês: 0%</span>
+                    <span class="habit-consistency" id="habit-consistency-text">Consistência: 0%</span>
                 </div>
                 <div class="add-task-box mb-16 p-12">
                     <span class="eyebrow">➕ Adicionar Novo Hábito</span>
                     <div class="add-task-form mt-6">
                         <input type="text" id="new-habit-input" class="input-text" placeholder="Ex: Resolver 1 exercício solo diariamente">
+                        <input type="text" id="new-habit-tag" class="input-text max-w-120" placeholder="Tag (ex: Core/Prática)">
                         <button type="button" class="btn-add" onclick="addNewHabit()">Adicionar Hábito</button>
                     </div>
                 </div>
                 <table class="habit-table">
-                    <thead><tr><th class="text-left">HÁBITO</th><th>SEG</th><th>TER</th><th>QUA</th><th>QUI</th><th>SEX</th><th>SÁB</th><th>DOM</th></tr></thead>
+                    <thead><tr><th class="text-left">HÁBITO</th><th>TAG</th><th>SEG</th><th>TER</th><th>QUA</th><th>QUI</th><th>SEX</th><th>SÁB</th><th>DOM</th><th>AÇÃO</th></tr></thead>
                     <tbody id="habit-table-body"></tbody>
                 </table>
             </div>
@@ -265,7 +309,7 @@
         <section id="tab-cursos" class="tab-content">
             <div class="flex-between mb-16">
                 <span class="section-subtitle">Grade Completa de Cursos Ativos</span>
-                <button type="button" class="btn-action" onclick="addNewCourse('active')">+ Adicionar Curso</button>
+                <button type="button" class="btn-action" onclick="addNewCourseModal('active')">+ Adicionar Disciplina</button>
             </div>
             <div id="full-active-courses-container" class="course-grid"></div>
         </section>
@@ -274,32 +318,33 @@
         <section id="tab-incubadora" class="tab-content">
             <div class="flex-between mb-16">
                 <span class="section-subtitle color-gray">Cursos e Frentes em Espera (Incubadora)</span>
-                <button type="button" class="btn-action" onclick="addNewCourse('incubated')">+ Adicionar à Incubadora</button>
+                <button type="button" class="btn-action" onclick="addNewCourseModal('incubated')">+ Adicionar à Incubadora</button>
             </div>
             <div id="incubated-courses-module-container" class="course-grid"></div>
         </section>
 
-        <!-- ABA 10: GRADE CURRICULAR -->
+        <!-- ABA 10: GRADE CURRICULAR INTERATIVA -->
         <section id="tab-grade" class="tab-content">
             <div class="card">
                 <div class="flex-between mb-16">
                     <div>
-                        <h3>🎓 Grade Horária Semanal (Aulas/Estudos)</h3>
-                        <p style="font-size:12px; color:var(--text-dim);">Mapeamento de horários fixos na semana.</p>
+                        <h3>🎓 Grade Curricular Semanal (Matriz Interativa)</h3>
+                        <p style="font-size:12px; color:var(--text-dim);">Clique em qualquer quadrado da tabela abaixo para editar cirurgicamente o compromisso daquele dia e horário específico.</p>
                     </div>
-                    <button type="button" class="btn-action" onclick="addNewClassSchedule()">+ Adicionar Horário</button>
+                    <button type="button" class="btn-action" onclick="openScheduleModal()">+ Adicionar Faixa Horária</button>
                 </div>
                 <div style="overflow-x:auto;">
                     <table style="width:100%; border-collapse:collapse; font-size:12px; font-family:var(--mono); text-align:center;">
                         <thead>
                             <tr style="background:var(--bg-subtle); color:var(--purple); border-bottom:2px solid var(--border);">
-                                <th style="padding:8px;">Horário</th>
-                                <th style="padding:8px;">Segunda</th>
-                                <th style="padding:8px;">Terça</th>
-                                <th style="padding:8px;">Quarta</th>
-                                <th style="padding:8px;">Quinta</th>
-                                <th style="padding:8px;">Sexta</th>
-                                <th style="padding:8px;">Sábado</th>
+                                <th style="padding:10px;">Horário</th>
+                                <th style="padding:10px;">Segunda</th>
+                                <th style="padding:10px;">Terça</th>
+                                <th style="padding:10px;">Quarta</th>
+                                <th style="padding:10px;">Quinta</th>
+                                <th style="padding:10px;">Sexta</th>
+                                <th style="padding:10px;">Sábado</th>
+                                <th style="padding:10px;">Domingo</th>
                             </tr>
                         </thead>
                         <tbody id="weekly-schedule-tbody"></tbody>
@@ -314,7 +359,7 @@
                 <div class="flex-between mb-16">
                     <div>
                         <h3>📌 Gestão de Tarefas & Prazos de Entrega</h3>
-                        <p style="font-size:12px; color:var(--text-dim);">Gerencie atividades com datas e prazos definidos.</p>
+                        <p style="font-size:12px; color:var(--text-dim);">Gerencie atividades com datas e prazos definidos de forma independente.</p>
                     </div>
                 </div>
 
@@ -338,7 +383,7 @@
             <div class="calendar-box">
                 <div class="calendar-header-nav">
                     <button type="button" class="btn-cal-nav" onclick="changeCalendarMonth(-1)">&lt; Mês Anterior</button>
-                    <span id="calendar-month-year-title">Agosto 2026</span>
+                    <span id="calendar-month-year-title">Mês 2026</span>
                     <button type="button" class="btn-cal-nav" onclick="changeCalendarMonth(1)">Próximo Mês &gt;</button>
                 </div>
                 <div class="calendar-grid" id="calendar-grid-days"></div>
@@ -355,75 +400,60 @@
 
             <div class="journal-container">
                 <div class="flex-between mb-16">
-                    <h2 class="section-title-mono">📆 Compromissos do Mês</h2>
+                    <h2 class="section-title-mono">📆 Compromissos Agendados</h2>
                     <button type="button" class="btn-reset" onclick="resetCalendarEvents()">Limpar Agenda</button>
                 </div>
                 <div id="calendar-events-list-container"></div>
             </div>
         </section>
 
-        <footer><span>MENTORII — CAREER OPERATING SYSTEM</span><span>Salvo Localmente</span></footer>
+        <footer><span>MENTORII — CAREER OPERATING SYSTEM</span><span>Multi-Perfil Local (CRUD 100% Client-Side)</span></footer>
     </main>
 
-    <!-- MODAL DE ONBOARDING E IMPORTAÇÃO ADAPTATIVA DE PDI / TRELLO -->
+    <!-- MODAL DE CONFIGURAÇÃO DE PERFIL -->
     <div id="onboarding-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
-        <div class="card" style="width:min(600px, 92%); max-height:90vh; overflow-y:auto; background:var(--bg-panel); border:2px solid var(--purple);">
+        <div class="card" style="width:min(520px, 94%); max-height:90vh; overflow-y:auto; background:var(--bg-panel); border:2px solid var(--purple);">
             <div class="flex-between mb-16">
-                <h3>⚙️ Configuração / Importação de PDI ou Trello</h3>
+                <h3>⚙️ Configuração de Perfil</h3>
                 <button type="button" class="btn-reset" onclick="closeOnboardingModal()">✕ Fechar</button>
             </div>
-
-            <!-- CAIXA DE IMPORTAÇÃO RÁPIDA -->
-            <div style="background:var(--bg-subtle); border:1px dashed var(--purple); padding:12px; border-radius:var(--radius-sm); margin-bottom:16px;">
-                <span style="font-size:11px; font-family:var(--mono); font-weight:bold; color:var(--purple); display:block; margin-bottom:6px;">📂 IMPORTAR PDI OU TRELLO PRONTO:</span>
-                
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-                    <button type="button" id="btn-trigger-file-input" class="btn-backup" style="font-size:11px; padding:6px 10px;">📄 Carregar Arquivo (PDI/Trello JSON)</button>
-                    <button type="button" id="btn-trigger-paste-box" class="btn-backup" style="font-size:11px; padding:6px 10px;">📋 Colar Texto/JSON</button>
-                    <input type="file" id="pdi-file-input-element" style="display:none" accept=".json,.txt,.html">
-                </div>
-                
-                <div id="paste-pdi-container" style="display:none; margin-top:10px;">
-                    <textarea id="paste-pdi-json-input" class="input-text" style="width:100%; height:70px; font-family:var(--mono); font-size:11px;" placeholder="Cole o código JSON do PDI, export do Trello ou texto aqui..."></textarea>
-                    <button type="button" id="btn-apply-pasted-pdi" class="btn-action" style="font-size:11px; margin-top:6px; width:100%;">✓ Aplicar Conteúdo Colado</button>
-                </div>
-
-                <!-- CAMPO VISUAL DO ARQUIVO INDEXADO -->
-                <div id="pdi-file-status-box" style="display:none; background:var(--bg-card); border:1px solid var(--purple); padding:8px 12px; border-radius:var(--radius-sm); margin-top:10px; align-items:center; justify-content:space-between; gap:8px;">
-                    <div style="font-size:11.5px; font-family:var(--mono); color:var(--purple); font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                        📌 Indexado: <span id="pdi-filename-label" style="text-decoration:underline;">Nenhum</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-                        <button type="button" class="btn-backup" style="font-size:10px; padding:3px 8px; color:var(--red);" onclick="clearIndexedPDI()">❌ Desfazer / Limpar</button>
-                    </div>
-                </div>
-            </div>
-
             <div class="form-group mb-10">
-                <label style="font-size:12px; font-family:var(--mono); font-weight:bold;">Perfil de Domínio:</label>
-                <select id="onb-profile-type" class="select-priority" style="width:100%; margin-top:4px;">
-                    <option value="engineering" selected>💻 Engenharia de Software / IA / Dev</option>
-                    <option value="concurso">⚖️ Concursos Públicos (Editais & Questões)</option>
-                    <option value="vestibular">🎓 Vestibulares / ENEM (Frentes & Simulado)</option>
-                </select>
+                <label style="font-size:12px; font-family:var(--mono); font-weight:bold;">Nome do Usuário:</label>
+                <input type="text" id="onb-user-name" class="input-text" style="width:100%; margin-top:4px;" placeholder="Seu Nome">
             </div>
             <div class="form-group mb-10" style="margin-top:10px;">
                 <label style="font-size:12px; font-family:var(--mono); font-weight:bold;">Meta / Objetivo Principal:</label>
-                <input type="text" id="onb-goal" class="input-text" style="width:100%;" placeholder="Ex: Estágio em Dev / Aprovação">
+                <input type="text" id="onb-goal" class="input-text" style="width:100%; margin-top:4px;" placeholder="Meta principal">
             </div>
             <div class="form-group mb-10" style="margin-top:10px;">
-                <label style="font-size:12px; font-family:var(--mono); font-weight:bold;">Foco Cirúrgico (Pontos de Atenção):</label>
-                <input type="text" id="onb-surgery-focus" class="input-text" style="width:100%;" placeholder="Ex: Prática Solo de Exercícios">
+                <label style="font-size:12px; font-family:var(--mono); font-weight:bold;">Foco Cirúrgico:</label>
+                <input type="text" id="onb-surgery-focus" class="input-text" style="width:100%; margin-top:4px;" placeholder="Ponto de atenção">
             </div>
-            <div class="form-group mb-10" style="margin-top:10px;">
-                <label style="font-size:12px; font-family:var(--mono); font-weight:bold;">Disciplinas/Matérias (separadas por vírgula):</label>
-                <textarea id="onb-subjects" class="input-text" style="width:100%; height:60px;" placeholder="Ex: Matéria A, Matéria B, Matéria C"></textarea>
-            </div>
-            <button type="button" class="btn-action" style="width:100%; margin-top:12px;" onclick="submitOnboardingForm()">✓ Salvar Configurações</button>
+            <button type="button" class="btn-action" style="width:100%; margin-top:16px; padding:10px;" onclick="submitOnboardingForm()">✓ Salvar Configurações</button>
         </div>
     </div>
 
-    <!-- SCRIPTS ORDENADOS -->
+    <!-- MODAL DE CRIAÇÃO DE FAIXA HORÁRIA NA GRADE -->
+    <div id="schedule-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:9999;">
+        <div class="card" style="width:min(420px, 92%); background:var(--bg-panel); border:2px solid var(--purple);">
+            <div class="flex-between mb-16">
+                <h3>🎓 Adicionar Nova Faixa Horária</h3>
+                <button type="button" class="btn-reset" onclick="closeScheduleModal()">✕ Cancelar</button>
+            </div>
+            <form onsubmit="saveNewScheduleTimeRow(event)">
+                <div class="form-group mb-16">
+                    <label style="font-size:11.5px; font-family:var(--mono); font-weight:bold;">Definir Horário (Ex: 08:00 - 10:00 ou Manhã):</label>
+                    <input type="text" id="sch-time" class="input-text" style="width:100%; margin-top:6px;" placeholder="Ex: 08:00 - 10:00" required>
+                    <p style="font-size:11px; color:var(--text-dim); margin-top:6px;">Depois de adicionar o horário, basta clicar diretamente em qualquer quadrado da tabela para preencher a matéria daquele dia!</p>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button type="submit" class="btn-action" style="flex:1;">✓ Criar Faixa</button>
+                    <button type="button" class="btn-backup" style="flex:1;" onclick="closeScheduleModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="mentorii-core.js"></script>
     <script src="oracle.js"></script>
     <script src="app.js"></script>

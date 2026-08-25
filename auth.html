@@ -1,245 +1,255 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="pastel">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentorii — Entrar ou Criar Conta</title>
+    <title>Mentorii — Autenticação & Privacidade de Perfis</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos específicos da página de Auth para centralizar o cartão na tela */
-        body.auth-page {
+        body {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--bg-main) 0%, var(--purple-light) 100%);
             padding: 20px;
+            background-color: var(--bg-page);
         }
-
-        .auth-card {
-            background-color: var(--bg-card);
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-panel);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             padding: 32px;
-            width: 100%;
-            max-width: 460px;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
-
         .auth-header {
             text-align: center;
             margin-bottom: 24px;
         }
-
-        .auth-logo {
-            font-family: var(--mono);
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--purple);
-            letter-spacing: -0.03em;
-        }
-
-        .auth-tagline {
-            font-size: 13px;
-            color: var(--text-dim);
+        .auth-header h1 {
+            font-size: 24px;
             margin-top: 4px;
         }
-
-        .auth-tabs-toggle {
+        .auth-tabs {
             display: flex;
-            background-color: var(--bg-subtle);
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
         }
-
         .auth-tab-btn {
             flex: 1;
-            background: none;
+            background: transparent;
+            color: var(--text-dim);
             border: none;
             padding: 8px;
-            font-family: var(--mono);
             font-size: 12px;
-            font-weight: 700;
-            color: var(--text-dim);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
         }
-
         .auth-tab-btn.active {
-            background-color: var(--bg-card);
             color: var(--purple);
-            box-shadow: var(--shadow-sm);
+            border-bottom-color: var(--purple);
+            background: transparent;
+            font-weight: 700;
         }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
+        .auth-form-group {
+            margin-bottom: 16px;
         }
-
-        .auth-field {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .auth-field label {
+        .auth-form-group label {
+            display: block;
             font-family: var(--mono);
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 700;
             color: var(--text);
-            text-transform: uppercase;
+            margin-bottom: 6px;
         }
-
-        .btn-auth-submit {
-            background-color: var(--purple);
-            color: #ffffff;
-            border: none;
-            border-radius: var(--radius-sm);
+        .user-card-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 12px;
-            font-family: var(--font-sans);
-            font-size: 14px;
-            font-weight: 700;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
             cursor: pointer;
-            margin-top: 6px;
+            transition: border-color 0.2s ease;
         }
-
-        .btn-auth-submit:hover {
-            filter: brightness(1.08);
-        }
-
-        .auth-footer-note {
-            text-align: center;
-            font-size: 11.5px;
-            color: var(--text-dim);
-            margin-top: 18px;
-        }
-
-        .auth-guest-link {
-            color: var(--purple);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
+        .user-card-item:hover {
+            border-color: var(--purple);
         }
     </style>
 </head>
-<body class="auth-page">
+<body>
 
-    <div class="auth-card">
-        <!-- LOGO & APRESENTAÇÃO -->
+    <div class="auth-container">
         <div class="auth-header">
-            <div class="eyebrow">ECOSSISTEMA ADAPTATIVO</div>
-            <div class="auth-logo">Mentorii</div>
-            <p class="auth-tagline">Seu Cockpit Inteligente de Estudos & Gestão de Carreira</p>
+            <div class="eyebrow">Career Operating System</div>
+            <h1>Mentorii Cockpit</h1>
+            <p class="topbar-description" style="margin-top: 4px;">Perfis Privados Protegidos por Senha Local.</p>
         </div>
 
-        <!-- SELETOR ENTRE LOGIN E CADASTRO -->
-        <div class="auth-tabs-toggle">
-            <button class="auth-tab-btn active" id="btn-tab-login" onclick="toggleAuthMode('login')">Entrar</button>
-            <button class="auth-tab-btn" id="btn-tab-register" onclick="toggleAuthMode('register')">Criar Conta</button>
+        <div class="auth-tabs">
+            <button type="button" class="auth-tab-btn active" id="tab-btn-login" onclick="switchAuthTab('login')">Entrar em Perfil</button>
+            <button type="button" class="auth-tab-btn" id="tab-btn-register" onclick="switchAuthTab('register')">+ Novo Perfil Privado</button>
         </div>
 
-        <!-- FORMULÁRIO DINÂMICO DE AUTENTICAÇÃO -->
-        <form class="auth-form" id="auth-main-form" onsubmit="handleAuthSubmit(event)">
-            <!-- CAMPO NOME (EXIBIDO NO CADASTRO) -->
-            <div class="auth-field" id="field-name-group" style="display: none;">
-                <label for="auth-user-name">Seu Nome / Apelido</label>
-                <input type="text" id="auth-user-name" class="input-text" placeholder="Ex: Débora Marra">
+        <div id="auth-section-login">
+            <div id="saved-users-list" style="margin-bottom: 16px;"></div>
+            
+            <div id="no-users-msg" style="display: none; text-align: center; color: var(--text-dim); padding: 20px; font-size: 12px; font-family: var(--mono);">
+                Nenhum perfil cadastrado neste navegador.<br>Clique na aba <b>"+ Novo Perfil Privado"</b> para começar!
+            </div>
+        </div>
+
+        <form id="auth-section-register" style="display: none;" onsubmit="handleCreateProfile(event)">
+            <div class="auth-form-group">
+                <label for="reg-name">Nome do Usuário:</label>
+                <input type="text" id="reg-name" class="input-text" style="width: 100%;" placeholder="Digite seu identificador" required>
             </div>
 
-            <!-- CAMPO E-MAIL -->
-            <div class="auth-field">
-                <label for="auth-email">E-mail</label>
-                <input type="email" id="auth-email" class="input-text" placeholder="seu.email@exemplo.com" required>
-            </div>
-
-            <!-- CAMPO SENHA -->
-            <div class="auth-field">
-                <label for="auth-password">Senha</label>
-                <input type="password" id="auth-password" class="input-text" placeholder="••••••••" required>
-            </div>
-
-            <!-- PERFIL DE ESTUDANTE (EXIBIDO NO CADASTRO) -->
-            <div class="auth-field" id="field-profile-group" style="display: none;">
-                <label for="auth-profile-type">Perfil de Estudo Principal</label>
-                <select id="auth-profile-type" class="select-priority" style="width: 100%;">
-                    <option value="vestibular">🎓 Vestibular / ENEM / Concursos</option>
-                    <option value="tech">💻 Tecnologia / Engenharia / Estágio</option>
-                    <option value="faculdade">📚 Graduação / Faculdade Geral</option>
+            <div class="auth-form-group">
+                <label for="reg-type">Área de Atuação / Domínio:</label>
+                <select id="reg-type" class="select-priority" style="width: 100%;">
+                    <option value="engineering" selected>Tecnologia / Desenvolvimento / Engenharia</option>
+                    <option value="concurso">Concursos Públicos</option>
+                    <option value="vestibular">Vestibulares / Acadêmico</option>
                 </select>
             </div>
 
-            <button type="submit" class="btn-auth-submit" id="auth-submit-btn">Entrar no Cockpit</button>
-        </form>
+            <div class="auth-form-group">
+                <label for="reg-pass">Senha Privada de Acesso (PIN):</label>
+                <input type="password" id="reg-pass" class="input-text" style="width: 100%;" placeholder="Senha para proteger seus dados" required>
+            </div>
 
-        <!-- MODO CONVIDADO / RODAPÉ -->
-        <div class="auth-footer-note">
-            Quer testar sem criar conta? 
-            <span class="auth-guest-link" onclick="enterAsGuest()">Entrar como Convidado &rarr;</span>
-        </div>
+            <div class="auth-form-group">
+                <label for="reg-goal">Objetivo / Meta Principal (Opcional):</label>
+                <input type="text" id="reg-goal" class="input-text" style="width: 100%;" placeholder="Meta principal de estudos">
+            </div>
+
+            <button type="submit" class="btn-action" style="width: 100%; padding: 10px; margin-top: 8px;">🔒 Criar Perfil Privado</button>
+        </form>
     </div>
 
-    <!-- SCRIPT DE INTERAÇÃO DA TELA DE AUTH -->
+    <script src="mentorii-core.js"></script>
     <script>
-        let currentAuthMode = 'login';
+        document.addEventListener("DOMContentLoaded", function () {
+            renderSavedUsers();
+        });
 
-        function toggleAuthMode(mode) {
-            currentAuthMode = mode;
-            const nameGroup = document.getElementById('field-name-group');
-            const profileGroup = document.getElementById('field-profile-group');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            const tabLogin = document.getElementById('btn-tab-login');
-            const tabRegister = document.getElementById('btn-tab-register');
+        function switchAuthTab(tab) {
+            const loginSection = document.getElementById('auth-section-login');
+            const regSection = document.getElementById('auth-section-register');
+            const btnLogin = document.getElementById('tab-btn-login');
+            const btnReg = document.getElementById('tab-btn-register');
 
-            if (mode === 'register') {
-                nameGroup.style.display = 'flex';
-                profileGroup.style.display = 'flex';
-                submitBtn.innerText = 'Criar Minha Conta & Iniciar PDI';
-                tabRegister.classList.add('active');
-                tabLogin.classList.remove('active');
+            if (tab === 'login') {
+                loginSection.style.display = 'block';
+                regSection.style.display = 'none';
+                btnLogin.classList.add('active');
+                btnReg.classList.remove('active');
+                renderSavedUsers();
             } else {
-                nameGroup.style.display = 'none';
-                profileGroup.style.display = 'none';
-                submitBtn.innerText = 'Entrar no Cockpit';
-                tabLogin.classList.add('active');
-                tabRegister.classList.remove('active');
+                loginSection.style.display = 'none';
+                regSection.style.display = 'block';
+                btnLogin.classList.remove('active');
+                btnReg.classList.add('active');
             }
         }
 
-        function handleAuthSubmit(event) {
+        function renderSavedUsers() {
+            const container = document.getElementById('saved-users-list');
+            const noUsersMsg = document.getElementById('no-users-msg');
+            const db = MentoriiCore.getAllUsersDB();
+            const keys = Object.keys(db);
+
+            container.innerHTML = "";
+
+            if (keys.length === 0) {
+                noUsersMsg.style.display = 'block';
+                return;
+            }
+
+            noUsersMsg.style.display = 'none';
+
+            keys.forEach(key => {
+                const u = db[key];
+                const name = u.profile?.name || "Usuário";
+                const type = (u.profile?.profileType || "geral").toUpperCase();
+                const goal = u.profile?.targetGoal || "Meta não configurada";
+
+                const card = document.createElement('div');
+                card.className = 'user-card-item';
+                card.innerHTML = `
+                    <div onclick="promptLoginWithKey('${key}', '${name}')" style="flex: 1; cursor: pointer;">
+                        <div style="font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text);">🔒 👤 ${name}</div>
+                        <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                            <span class="tag" style="font-size: 9px;">${type}</span> ${goal}
+                        </div>
+                    </div>
+                    <button type="button" onclick="deleteUserKey(event, '${key}', '${name}')" style="color: var(--red); background: transparent; border: none; font-size: 14px; padding: 4px 8px;" title="Excluir Perfil">🗑️</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function promptLoginWithKey(userKey, name) {
+            const pass = prompt(`Digite a senha privada para acessar o perfil de ${name}:`);
+            if (pass === null) return;
+
+            const success = MentoriiCore.loginUser(userKey, pass);
+            if (success) {
+                window.location.href = 'index.html';
+            } else {
+                alert("❌ Senha incorreta! Acesso negado.");
+            }
+        }
+
+        function handleCreateProfile(event) {
             event.preventDefault();
-            const email = document.getElementById('auth-email').value;
-            const name = document.getElementById('auth-user-name').value || 'Estudante';
-            const profile = document.getElementById('auth-profile-type').value;
+            const nameInput = document.getElementById('reg-name');
+            const typeInput = document.getElementById('reg-type');
+            const passInput = document.getElementById('reg-pass');
+            const goalInput = document.getElementById('reg-goal');
 
-            // Salva os dados da sessão do usuário no LocalStorage
-            const sessionData = {
-                loggedIn: true,
-                userName: currentAuthMode === 'register' ? name : (email.split('@')[0]),
-                userEmail: email,
-                profileType: profile,
-                createdAt: new Date().toISOString()
-            };
+            if (!nameInput.value.trim() || !passInput.value) return;
 
-            localStorage.setItem('mentorii_user_session', JSON.stringify(sessionData));
+            const userKey = MentoriiCore.createUser(nameInput.value.trim(), typeInput.value, passInput.value);
+            
+            if (goalInput.value.trim()) {
+                MentoriiCore.state.profile.targetGoal = goalInput.value.trim();
+                MentoriiCore.save();
+            }
 
-            // Redireciona para o Cockpit principal
             window.location.href = 'index.html';
         }
 
-        function enterAsGuest() {
-            const guestData = {
-                loggedIn: true,
-                userName: 'Estudante Convidado',
-                userEmail: 'convidado@mentorii.app',
-                profileType: 'tech',
-                isGuest: true
-            };
-            localStorage.setItem('mentorii_user_session', JSON.stringify(guestData));
-            window.location.href = 'index.html';
+        function deleteUserKey(event, key, name) {
+            event.stopPropagation();
+            const pass = prompt(`Para excluir o perfil de "${name}", digite a senha de segurança:`);
+            if (pass === null) return;
+
+            const db = MentoriiCore.getAllUsersDB();
+            if (db[key] && db[key].profile?.password === pass) {
+                delete db[key];
+                MentoriiCore.saveAllUsersDB(db);
+
+                const remainingKeys = Object.keys(db);
+                if (remainingKeys.length > 0) {
+                    localStorage.setItem('mentorii_active_user_key', remainingKeys[0]);
+                } else {
+                    localStorage.removeItem('mentorii_active_user_key');
+                }
+
+                renderSavedUsers();
+                alert("🗑️ Perfil excluído com sucesso.");
+            } else {
+                alert("❌ Senha incorreta. Exclusão cancelada.");
+            }
         }
     </script>
 </body>

@@ -13,7 +13,6 @@
     --text: #212529;
     --text-dim: #868E96;
     
-    /* PALETA PASTEL TECH */
     --purple: #9D7BB0;
     --purple-light: #F3EDF7;
     --pink: #E287A8;
@@ -51,7 +50,6 @@ body {
     margin: 0 auto;
 }
 
-/* TOPBAR */
 .topbar {
     display: flex;
     justify-content: space-between;
@@ -91,7 +89,6 @@ h1 {
     flex-wrap: wrap;
 }
 
-/* BUTTONS */
 button {
     font-family: var(--mono);
     font-size: 11.5px;
@@ -137,7 +134,6 @@ button {
     color: #FFFFFF;
 }
 
-/* GLOBAL PROGRESS BAR */
 .global-progress-box {
     display: flex;
     align-items: center;
@@ -183,7 +179,6 @@ button {
     white-space: nowrap;
 }
 
-/* TABS NAVIGATION */
 .nav-tabs {
     display: flex;
     gap: 6px;
@@ -215,7 +210,6 @@ button {
     border-style: dashed;
 }
 
-/* SECTIONS / TABS */
 .tab-content {
     display: none;
 }
@@ -224,7 +218,6 @@ button {
     display: block;
 }
 
-/* CARDS */
 .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -253,7 +246,6 @@ button {
     margin-bottom: 12px;
 }
 
-/* ORACLE CARD */
 .oracle-card {
     background: var(--salvia-light);
     border: 1px solid rgba(130, 179, 154, 0.5);
@@ -275,7 +267,6 @@ button {
     color: #2B593F;
 }
 
-/* DAILY FOCUS & POMODORO */
 .daily-focus-card {
     display: grid;
     grid-template-columns: 1fr 280px;
@@ -338,7 +329,6 @@ button {
     color: var(--text-dim);
 }
 
-/* POMODORO */
 .pomodoro-box {
     background: var(--bg-subtle);
     border-radius: var(--radius-sm);
@@ -383,7 +373,6 @@ button {
     padding: 5px 10px;
 }
 
-/* SPRINTS */
 .sprint-box {
     background: var(--bg-panel);
     border: 1px solid var(--border);
@@ -403,7 +392,6 @@ button {
     list-style: none;
 }
 
-/* 3 FOCUS FRENTS */
 .priority-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -442,7 +430,6 @@ button {
     font-weight: 700;
 }
 
-/* COURSES & ACCORDIONS */
 .course-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -458,7 +445,6 @@ button {
     font-size: 13.5px;
 }
 
-/* MATRIZ DE PRIORIDADES & HERO */
 .priority-hero {
     display: grid;
     grid-template-columns: 1fr 180px;
@@ -488,7 +474,6 @@ button {
     margin-bottom: 4px;
 }
 
-/* HABIT TABLE & MATRICES */
 .habit-table {
     width: 100%;
     border-collapse: collapse;
@@ -514,7 +499,26 @@ button {
     text-align: left;
 }
 
-/* TAMAGOTCHI WORLD */
+/* ESTILOS DA GRADE CURRICULAR INTERATIVA */
+.schedule-cell {
+    border: 1px solid var(--border-light);
+    background: var(--bg-panel);
+    font-size: 11.5px;
+    padding: 12px 8px;
+    vertical-align: middle;
+    height: 48px;
+}
+
+.interactive-cell {
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.interactive-cell:hover {
+    background-color: var(--purple-light);
+    border-color: var(--purple);
+}
+
 .mentorii-world-container {
     background: var(--bg-panel);
     border: 1px solid var(--border);
@@ -570,7 +574,6 @@ button {
     color: var(--text-dim);
 }
 
-/* CALENDAR & JOURNAL */
 .calendar-box {
     background: var(--bg-panel);
     border: 1px solid var(--border);
@@ -637,7 +640,6 @@ button {
     margin-top: 2px;
 }
 
-/* CHARTS GRID */
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -658,7 +660,6 @@ button {
     margin-bottom: 12px;
 }
 
-/* UTILS */
 .flex-between {
     display: flex;
     justify-content: space-between;

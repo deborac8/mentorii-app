@@ -1,18 +1,18 @@
 /* ============================================================ */
-/* MENTORII — MOTOR ANALÍTICO DO ORÁCULO & SANITIZADOR DETERMINÍSTICO */
+/* MENTORII — MOTOR DO ORÁCULO DE IA & SANITIZADOR DETERMINÍSTICO*/
 /* ============================================================ */
 
 const MentoriiOracle = {
 
     generateFallbackRecommendation: function(userData) {
-        if (!userData || !userData.activeCourses || userData.activeCourses.length === 0) {
-            return "✨ <b>Diagnóstico do Mentor:</b> Configure suas disciplinas no botão '+ Adicionar Disciplina' ou no PDI para receber diagnósticos customizados.";
+        if (!userData || !userData.profile || !userData.profile.targetGoal || userData.profile.targetGoal.trim().length === 0) {
+            return "✨ <b>Diagnóstico do Mentor:</b> Bem-vindo ao Mentorii! Vá na aba <b>'📥 Importar PDI & JSON'</b> para carregar seu plano de estudos.";
         }
 
-        const goal = userData.profile?.targetGoal || "sua meta principal";
-        const surgery = userData.profile?.surgeryFocus || "Desenvolvimento Prático e Foco Solo";
+        const goal = userData.profile.targetGoal;
+        const surgery = userData.profile.surgeryFocus || "prática consistente e resolução de exercícios";
 
-        return `🔬 <b>Diagnóstico do Mentor:</b> Para consolidar <b>${goal}</b>, seu principal pilar cirúrgico é zerar as pendências em <b>${surgery}</b>.<br>👉 <b>Recomendação de Hoje:</b> Execute blocos de Pomodoro dedicados para resolução solo de exercícios e registre suas evidências!`;
+        return `🔬 <b>Diagnóstico do Mentor:</b> Para consolidar <b>${goal}</b>, seu foco cirúrgico prioritário é <b>${surgery}</b>.<br>👉 <b>Recomendação:</b> Execute blocos de Pomodoro dedicados para resolução de exercícios e registre o progresso nos seus cadernos!`;
     },
 
     calculateReadinessScore: function(activeCourses) {
@@ -35,9 +35,6 @@ const MentoriiOracle = {
         return Math.min(100, Math.round((completedItems / totalItems) * 100));
     },
 
-    /**
-     * PROCESSADOR DETERMINÍSTICO DE PDI / TRELLO (CUSTO ZERO & ANTI-RUÍDO)
-     */
     parsePDIStructure: function(rawInput, userProfileType = "engineering") {
         if (!rawInput) return null;
 
@@ -47,21 +44,16 @@ const MentoriiOracle = {
         let parsedData = null;
         const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-            try { 
-                parsedData = JSON.parse(jsonMatch[0]); 
-            } catch (e) {
-                console.warn("Parse adaptativo em execução...", e);
-            }
+            try { parsedData = JSON.parse(jsonMatch[0]); } catch (e) {}
         }
 
         let allFoundItems = [];
-        let targetGoal = userProfileType === "engineering" ? "Visão Computacional + IC + Portfólio C#" : 
-                         (userProfileType === "concurso" ? "Aprovação em Concurso Público" : "Aprovação em Vestibular / ENEM");
-        let surgeryFocus = "Desenvolvimento Prático e Foco Solo";
+        let targetGoal = "";
+        let surgeryFocus = "";
 
         if (parsedData && typeof parsedData === "object") {
-            targetGoal = findStringInObject(parsedData, ['objetivo', 'meta', 'goal', 'titulo', 'targetGoal']) || targetGoal;
-            surgeryFocus = findStringInObject(parsedData, ['foco', 'cirurgico', 'fraqueza', 'surgeryFocus', 'prioridade']) || surgeryFocus;
+            targetGoal = findStringInObject(parsedData, ['objetivo', 'meta', 'goal', 'titulo', 'targetGoal']) || "";
+            surgeryFocus = findStringInObject(parsedData, ['foco', 'cirurgico', 'fraqueza', 'surgeryFocus', 'prioridade']) || "";
 
             const rawCards = parsedData.cards || findAllArraysInObject(parsedData).flat();
 
@@ -86,7 +78,7 @@ const MentoriiOracle = {
                         completed: false,
                         items: subItems.length > 0 ? subItems : [
                             { id: `i_${idx}_1`, name: "Módulo 1: Conceitos e Fundamentos", done: false },
-                            { id: `i_${idx}_2`, name: "Módulo 2: Prática e Resolução Solo", done: false },
+                            { id: `i_${idx}_2`, name: "Módulo 2: Prática e Resolução", done: false },
                             { id: `i_${idx}_3`, name: "Módulo 3: Exercícios de Fixação", done: false }
                         ]
                     });
@@ -109,7 +101,7 @@ const MentoriiOracle = {
                         completed: false,
                         items: [
                             { id: `i_${idx}_1`, name: "Módulo 1: Conceitos e Fundamentos", done: false },
-                            { id: `i_${idx}_2`, name: "Módulo 2: Prática e Resolução Solo", done: false },
+                            { id: `i_${idx}_2`, name: "Módulo 2: Prática e Resolução", done: false },
                             { id: `i_${idx}_3`, name: "Módulo 3: Exercícios de Fixação", done: false }
                         ] 
                     });

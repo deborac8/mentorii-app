@@ -3,6 +3,12 @@
 /* ============================================================ */
 
 document.addEventListener("DOMContentLoaded", function () {
+    if (!MentoriiCore.currentUserKey || !MentoriiCore.getAllUsersDB()[MentoriiCore.currentUserKey]) {
+        window.location.href = 'auth.html';
+        return;
+    }
+
+    renderUserSelector();
     renderDashboard();
     renderNotebookCards();
     renderEvidences();
@@ -19,9 +25,53 @@ document.addEventListener("DOMContentLoaded", function () {
     setupEventListeners();
 });
 
-// ============================================================
-// 1. NAVEGAÇÃO DE ABAS
-// ============================================================
+function renderUserSelector() {
+    const selector = document.getElementById('user-profile-selector');
+    if (!selector) return;
+
+    const db = MentoriiCore.getAllUsersDB();
+    const activeKey = MentoriiCore.currentUserKey;
+
+    selector.innerHTML = Object.keys(db).map(key => {
+        const u = db[key];
+        const name = u.profile?.name || "Estudante Privado";
+        const type = (u.profile?.profileType || "geral").toUpperCase();
+        return `<option value="${key}" ${key === activeKey ? 'selected' : ''}>🔒 👤 ${name} (${type})</option>`;
+    }).join('') + `<option value="__logout__">🚪 Sair / Trocar Perfil...</option>`;
+}
+
+window.onUserSelectChange = function(selectEl) {
+    const val = selectEl.value;
+    if (val === "__logout__") {
+        localStorage.removeItem('mentorii_active_user_key');
+        window.location.href = 'auth.html';
+    } else {
+        const pass = prompt("Digite a senha privada para acessar este perfil:");
+        if (pass !== null && MentoriiCore.loginUser(val, pass)) {
+            renderDashboard();
+            renderAllTabs();
+        } else {
+            alert("❌ Senha incorreta ou acesso cancelado.");
+            renderUserSelector();
+        }
+    }
+};
+
+function renderAllTabs() {
+    renderNotebookCards();
+    renderEvidences();
+    renderICExperiments();
+    renderNoAITrainingHistory();
+    renderHabitsTable();
+    renderCalendar();
+    renderJournalTasks();
+    renderOperationalTasks();
+    renderSprintGoals();
+    renderPriorityMatrix();
+    renderWeeklyScheduleTable();
+    initCharts();
+}
+
 window.switchTab = function(tabId, element) {
     const allContents = document.querySelectorAll('.tab-content');
     allContents.forEach(content => {
@@ -51,11 +101,10 @@ window.switchTab = function(tabId, element) {
         renderDiaryList();
     }
     if (tabId === 'tab-prioridades') renderPriorityMatrix();
+    if (tabId === 'tab-cursos') renderActiveCourses();
+    if (tabId === 'tab-incubadora') renderActiveCourses();
 };
 
-// ============================================================
-// 2. DASHBOARD & RENDERIZAÇÃO CENTRAL
-// ============================================================
 window.renderDashboard = function() {
     const state = MentoriiCore.state;
 
@@ -65,11 +114,14 @@ window.renderDashboard = function() {
     const profileTypeLabel = document.getElementById('user-profile-type');
     const topbarSource = document.getElementById('topbar-pdi-source');
 
-    if (pdiTitle) pdiTitle.innerText = state.profile.targetGoal || "Mentorii Cockpit";
-    if (pdiDesc) pdiDesc.innerText = `Foco Cirúrgico: ${state.profile.surgeryFocus || 'Desenvolvimento e Prática Solo'}`;
-    if (surgeryDesc) surgeryDesc.innerText = `Foco Cirúrgico: ${state.profile.surgeryFocus || 'Desenvolvimento e Prática Solo'}`;
-    if (profileTypeLabel) profileTypeLabel.innerText = `PERFIL: ${(state.profile.profileType || 'GERAL').toUpperCase()} | ${state.profile.name || 'Estudante'}`;
-    if (topbarSource) topbarSource.innerText = state.profile.indexedFileName || "PDI Padrão / Configuração Local";
+    const hasGoal = state.profile.targetGoal && state.profile.targetGoal.trim().length > 0;
+    const hasName = state.profile.name && state.profile.name.trim().length > 0;
+
+    if (pdiTitle) pdiTitle.innerText = hasGoal ? state.profile.targetGoal : "Defina sua Meta Principal";
+    if (pdiDesc) pdiDesc.innerText = state.profile.surgeryFocus ? `Foco Cirúrgico: ${state.profile.surgeryFocus}` : "Vá na aba 'Importar PDI & JSON' para carregar seu plano de estudos.";
+    if (surgeryDesc) surgeryDesc.innerText = state.profile.surgeryFocus ? `Foco Cirúrgico: ${state.profile.surgeryFocus}` : "Defina suas fraquezas e pontos de atenção para cálculo estratégico.";
+    if (profileTypeLabel) profileTypeLabel.innerText = `PERFIL PRIVADO: ${(state.profile.profileType || 'GERAL').toUpperCase()} | ${hasName ? state.profile.name : 'Estudante'}`;
+    if (topbarSource) topbarSource.innerText = state.profile.indexedFileName || "Nenhum PDI importado";
 
     const oracleText = document.getElementById('oracle-recommendation-text');
     if (oracleText && window.MentoriiOracle) {
@@ -77,6 +129,10 @@ window.renderDashboard = function() {
     }
 
     const readinessScore = window.MentoriiOracle ? MentoriiOracle.calculateReadinessScore(state.activeCourses) : 0;
+    
+    MentoriiCore.updatePetStageByProgress(readinessScore);
+    MentoriiCore.save();
+
     const globalProgressText = document.getElementById('global-progress-text');
     const globalProgressBar = document.getElementById('global-progress-bar');
     const readinessHero = document.getElementById('readiness-score-hero');
@@ -104,7 +160,7 @@ function renderThreeFocusFrents() {
     container.innerHTML = "";
 
     if (courses.length === 0) {
-        container.innerHTML = `<div class="card" style="grid-column: 1/-1; color:var(--text-dim); text-align:center;">Nenhuma disciplina ativa configurada.</div>`;
+        container.innerHTML = `<div class="card" style="grid-column: 1/-1; color:var(--text-dim); text-align:center; padding:16px;">Nenhuma disciplina ativa. Importe um PDI na aba <b>"Importar PDI & JSON"</b>.</div>`;
         return;
     }
 
@@ -149,9 +205,6 @@ window.renderPetStatus = function() {
     if (dexVal) dexVal.innerText = rpg.dex || 0;
 };
 
-// ============================================================
-// 3. CURSOS & MÓDULOS (CRUD COMPLETO)
-// ============================================================
 window.renderActiveCourses = function() {
     const fullActiveContainer = document.getElementById('full-active-courses-container');
     const incubatedContainer = document.getElementById('incubated-courses-module-container');
@@ -288,10 +341,10 @@ window.deleteCourse = function(courseId) {
 };
 
 window.addNewCourseModal = function(type) {
-    const title = prompt("Nome da nova disciplina:");
+    const title = prompt("Nome da nova disciplina/curso:");
     if (!title || !title.trim()) return;
 
-    const tag = prompt("Tag / Categoria (ex: Visão / IA, Backend, Lógica, Geral):", "Geral") || "Geral";
+    const tag = prompt("Tag / Categoria:", "Geral") || "Geral";
 
     const newCourse = {
         id: `course_${Date.now()}`,
@@ -316,9 +369,6 @@ window.addNewCourseModal = function(type) {
     renderDashboard();
 };
 
-// ============================================================
-// 4. MATRIZ DE PRIORIDADES DINÂMICA
-// ============================================================
 window.renderPriorityMatrix = function() {
     const container = document.getElementById('priority-matrix-table-container');
     if (!container) return;
@@ -328,7 +378,7 @@ window.renderPriorityMatrix = function() {
     if (activeCourses.length === 0) {
         container.innerHTML = `
             <div class="card" style="padding:16px; text-align:center; color:var(--text-dim);">
-                Nenhuma disciplina ativa encontrada. Adicione frentes para preencher a Matriz.
+                Nenhuma disciplina ativa encontrada. Importe um PDI na aba "Importar PDI & JSON".
             </div>`;
         return;
     }
@@ -372,9 +422,6 @@ window.renderPriorityMatrix = function() {
     `;
 };
 
-// ============================================================
-// 5. DIÁRIO DE PROGRESSO (SEM NaN%)
-// ============================================================
 function renderDiarySummary() {
     let totalItems = 0;
     let totalDone = 0;
@@ -390,9 +437,15 @@ function renderDiarySummary() {
     const pct = totalItems > 0 ? Math.round((totalDone / totalItems) * 100) : 0;
     const ringText = document.getElementById('ring-text');
     const ringSub = document.getElementById('ring-sub');
+    const ringFg = document.getElementById('ring-fg');
 
     if (ringText) ringText.textContent = pct + '%';
     if (ringSub) ringSub.innerHTML = `<b>${totalDone}</b> / ${totalItems} itens concluídos`;
+    
+    if (ringFg) {
+        const dashOffset = 427 - (427 * pct) / 100;
+        ringFg.style.strokeDashoffset = dashOffset;
+    }
 
     const groupsContainer = document.getElementById('diary-groups');
     if (groupsContainer) {
@@ -405,21 +458,25 @@ function renderDiarySummary() {
             categoryMap[cat].done += cItems.filter(i => i.done).length;
         });
 
-        groupsContainer.innerHTML = Object.keys(categoryMap).map(cat => {
-            const data = categoryMap[cat];
-            const cPct = data.total > 0 ? Math.round((data.done / data.total) * 100) : 0;
-            return `
-                <div style="margin-bottom:8px;">
-                    <div style="display:flex; justify-content:space-between; font-size:11px; font-family:var(--mono);">
-                        <span>${cat}</span>
-                        <span style="font-weight:bold; color:var(--purple);">${data.done}/${data.total}</span>
+        if (Object.keys(categoryMap).length === 0) {
+            groupsContainer.innerHTML = `<p style="font-size:11px; color:var(--text-dim);">Nenhuma categoria ativa para exibir progresso.</p>`;
+        } else {
+            groupsContainer.innerHTML = Object.keys(categoryMap).map(cat => {
+                const data = categoryMap[cat];
+                const cPct = data.total > 0 ? Math.round((data.done / data.total) * 100) : 0;
+                return `
+                    <div style="margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; font-size:11px; font-family:var(--mono);">
+                            <span>${cat}</span>
+                            <span style="font-weight:bold; color:var(--purple);">${data.done}/${data.total} (${cPct}%)</span>
+                        </div>
+                        <div style="height:5px; background:var(--bg-subtle); border-radius:3px; overflow:hidden; margin-top:2px;">
+                            <div style="height:100%; width:${cPct}%; background:var(--purple); transition:width 0.3s ease;"></div>
+                        </div>
                     </div>
-                    <div style="height:5px; background:var(--bg-subtle); border-radius:3px; overflow:hidden; margin-top:2px;">
-                        <div style="height:100%; width:${cPct}%; background:var(--purple);"></div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        }
     }
 }
 
@@ -429,7 +486,7 @@ function renderDiaryList() {
 
     const courses = MentoriiCore.state.activeCourses || [];
     if (courses.length === 0) {
-        container.innerHTML = `<div class="card" style="color:var(--text-dim); text-align:center;">Nenhuma disciplina ativa.</div>`;
+        container.innerHTML = `<div class="card" style="color:var(--text-dim); text-align:center; padding:16px;">Nenhuma disciplina ativa cadastrada.</div>`;
         return;
     }
 
@@ -453,9 +510,6 @@ function renderDiaryList() {
     }).join('');
 }
 
-// ============================================================
-// 6. NOTEBOOK TÉCNICO (CRUD COMPLETO COM EDIÇÃO DE NOME)
-// ============================================================
 window.renderNotebookCards = function() {
     const container = document.getElementById('custom-notebook-cards-container');
     if (!container) return;
@@ -506,7 +560,7 @@ window.createNewNotebook = function() {
     const title = prompt("Título do novo caderno:");
     if (!title || !title.trim()) return;
 
-    const subject = prompt("Assunto / Tag (ex: C#, Visão Computacional, Lógica):", "Geral") || "Geral";
+    const subject = prompt("Assunto / Tag:", "Geral") || "Geral";
 
     if (!Array.isArray(MentoriiCore.state.notebooks)) MentoriiCore.state.notebooks = [];
     MentoriiCore.state.notebooks.push({
@@ -574,9 +628,6 @@ window.deleteExerciseFromNotebook = function(nbIdx, exIdx) {
     }
 };
 
-// ============================================================
-// 7. POMODORO, SPRINTS & FOCO DO DIA
-// ============================================================
 let pomoTimerInterval = null;
 
 window.togglePomodoro = function() {
@@ -586,7 +637,7 @@ window.togglePomodoro = function() {
     if (pomo.isRunning) {
         pomo.isRunning = false;
         clearInterval(pomoTimerInterval);
-        if (btn) btn.innerText = "▶ Iniciar";
+        if (btn) btn.innerText = "▶ Retomar";
     } else {
         pomo.isRunning = true;
         if (btn) btn.innerText = "⏸ Pausar";
@@ -651,7 +702,7 @@ window.renderSprintGoals = function() {
 
     const sprints = MentoriiCore.state.sprints || [];
     if (sprints.length === 0) {
-        list.innerHTML = `<li style="font-size:12px; color:var(--text-dim); list-style:none;">Nenhuma meta semanal cadastrada.</li>`;
+        list.innerHTML = `<li style="font-size:12px; color:var(--text-dim); list-style:none;">Nenhuma meta semanal cadastrada. Clique em "+ Adicionar Meta Semanal".</li>`;
         return;
     }
 
@@ -684,9 +735,6 @@ window.deleteSprintGoal = function(idx) {
     }
 };
 
-// ============================================================
-// 8. HÁBITOS, CALENDÁRIO & TAREFAS OPERACIONAIS
-// ============================================================
 window.renderHabitsTable = function() {
     const tbody = document.getElementById('habit-table-body');
     if (!tbody) return;
@@ -694,6 +742,11 @@ window.renderHabitsTable = function() {
     const habits = MentoriiCore.state.habits || [];
     let totalChecks = 0;
     let checkedCount = 0;
+
+    if (habits.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="padding:16px; color:var(--text-dim);">Nenhum hábito cadastrado.</td></tr>`;
+        return;
+    }
 
     tbody.innerHTML = habits.map((h, hIdx) => {
         totalChecks += 7;
@@ -753,7 +806,105 @@ window.deleteHabit = function(hIdx) {
     }
 };
 
-// AGENDA MENSAL
+window.renderWeeklyScheduleTable = function() {
+    const tbody = document.getElementById('weekly-schedule-tbody');
+    if (!tbody) return;
+
+    const schedule = MentoriiCore.state.classSchedule || [];
+    tbody.innerHTML = "";
+
+    if (schedule.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="padding:16px; color:var(--text-dim); text-align:center;">Nenhum horário cadastrado. Clique em "+ Adicionar Faixa Horária".</td></tr>`;
+        return;
+    }
+
+    const daysKeys = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
+
+    schedule.forEach((row, rowIdx) => {
+        const tr = document.createElement('tr');
+        
+        let cellsHTML = `
+            <td style="padding:10px; font-weight:bold; color:var(--purple); background:var(--bg-subtle);">
+                ${row.time} 
+                <button onclick="deleteScheduleRow(${rowIdx})" style="color:var(--red); border:none; background:none; cursor:pointer; font-size:10px; margin-left:4px;" title="Excluir Horário">✕</button>
+            </td>
+        `;
+
+        daysKeys.forEach(day => {
+            const val = row[day] || "";
+            cellsHTML += `
+                <td class="schedule-cell interactive-cell" onclick="editScheduleCell(${rowIdx}, '${day}')" title="Clique para editar este horário específico">
+                    ${val ? `<span class="tag">${val}</span>` : '<span style="color:var(--text-dim); font-size:10px;">+ Adicionar</span>'}
+                </td>
+            `;
+        });
+
+        tr.innerHTML = cellsHTML;
+        tbody.appendChild(tr);
+    });
+};
+
+window.openScheduleModal = function() {
+    const modal = document.getElementById('schedule-modal');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeScheduleModal = function() {
+    const modal = document.getElementById('schedule-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.saveNewScheduleTimeRow = function(event) {
+    event.preventDefault();
+    const time = document.getElementById('sch-time').value.trim();
+
+    if (!time) {
+        alert("Informe o horário (Ex: 08:00 - 10:00).");
+        return;
+    }
+
+    if (!Array.isArray(MentoriiCore.state.classSchedule)) MentoriiCore.state.classSchedule = [];
+    
+    if (MentoriiCore.state.classSchedule.some(s => s.time === time)) {
+        alert("Este horário já está cadastrado na grade.");
+        return;
+    }
+
+    MentoriiCore.state.classSchedule.push({
+        id: `sch_${Date.now()}`,
+        time: time,
+        seg: "", ter: "", qua: "", qui: "", sex: "", sab: "", dom: ""
+    });
+
+    MentoriiCore.save();
+    renderWeeklyScheduleTable();
+    closeScheduleModal();
+    document.getElementById('sch-time').value = '';
+};
+
+window.editScheduleCell = function(rowIdx, dayKey) {
+    const schedule = MentoriiCore.state.classSchedule || [];
+    if (!schedule[rowIdx]) return;
+
+    const currentVal = schedule[rowIdx][dayKey] || "";
+    const dayNames = { seg: "Segunda", ter: "Terça", qua: "Quarta", qui: "Quinta", sex: "Sexta", sab: "Sábado", dom: "Domingo" };
+    
+    const newVal = prompt(`Editar atividade para ${dayNames[dayKey]} (${schedule[rowIdx].time}):`, currentVal);
+    if (newVal !== null) {
+        schedule[rowIdx][dayKey] = newVal.trim();
+        MentoriiCore.save();
+        renderWeeklyScheduleTable();
+    }
+};
+
+window.deleteScheduleRow = function(rowIdx) {
+    if (confirm("Deseja excluir esta linha de horário inteira?")) {
+        MentoriiCore.state.classSchedule.splice(rowIdx, 1);
+        MentoriiCore.save();
+        renderWeeklyScheduleTable();
+    }
+};
+
 let calCurrentDate = new Date();
 let selectedCalendarDateStr = new Date().toLocaleDateString('pt-BR');
 
@@ -880,7 +1031,6 @@ window.resetCalendarEvents = function() {
     }
 };
 
-// TAREFAS OPERACIONAIS
 window.addNewOperationalTask = function() {
     const nameInput = document.getElementById('task-name-input');
     const dateInput = document.getElementById('task-date-input');
@@ -951,61 +1101,6 @@ window.deleteOperationalTask = function(id) {
     renderOperationalTasks();
 };
 
-// GRADE HORÁRIA
-window.renderWeeklyScheduleTable = function() {
-    const tbody = document.getElementById('weekly-schedule-tbody');
-    if (!tbody) return;
-
-    const schedule = MentoriiCore.state.classSchedule || [];
-    tbody.innerHTML = "";
-
-    if (schedule.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="padding:16px; color:var(--text-dim);">Nenhum horário cadastrado.</td></tr>`;
-        return;
-    }
-
-    schedule.forEach((row, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="padding:8px; font-weight:bold; color:var(--purple);">${row.time}</td>
-            <td style="padding:8px;">${row.seg || '-'}</td>
-            <td style="padding:8px;">${row.ter || '-'}</td>
-            <td style="padding:8px;">${row.qua || '-'}</td>
-            <td style="padding:8px;">${row.qui || '-'}</td>
-            <td style="padding:8px;">${row.sex || '-'}</td>
-            <td style="padding:8px;">${row.sab || '-'}</td>
-            <td style="padding:8px;"><button onclick="deleteClassSchedule(${idx})" style="color:var(--red); border:none; background:none; cursor:pointer;">🗑️</button></td>
-        `;
-        tbody.appendChild(tr);
-    });
-};
-
-window.addNewClassSchedule = function() {
-    const timeStr = prompt("Horário da Linha (ex: 08:00 - 10:00):", "08:00 - 10:00");
-    if (!timeStr) return;
-
-    const seg = prompt("Segunda-feira:", "") || "";
-    const ter = prompt("Terça-feira:", "") || "";
-    const qua = prompt("Quarta-feira:", "") || "";
-    const qui = prompt("Quinta-feira:", "") || "";
-    const sex = prompt("Sexta-feira:", "") || "";
-    const sab = prompt("Sábado:", "") || "";
-
-    if (!Array.isArray(MentoriiCore.state.classSchedule)) MentoriiCore.state.classSchedule = [];
-    MentoriiCore.state.classSchedule.push({ id: `sch_${Date.now()}`, time: timeStr, seg, ter, qua, qui, sex, sab });
-    MentoriiCore.save();
-    renderWeeklyScheduleTable();
-};
-
-window.deleteClassSchedule = function(idx) {
-    if ((MentoriiCore.state.classSchedule || [])[idx]) {
-        MentoriiCore.state.classSchedule.splice(idx, 1);
-        MentoriiCore.save();
-        renderWeeklyScheduleTable();
-    }
-};
-
-// EVIDÊNCIAS & EXPERIMENTOS
 window.addEvidence = function() {
     const title = document.getElementById('ev-title').value;
     const link = document.getElementById('ev-link').value;
@@ -1112,9 +1207,6 @@ window.deleteNoAITraining = function(idx) {
     }
 };
 
-// ============================================================
-// 9. MODAL & ONBOARDING DETERMINÍSTICO
-// ============================================================
 window.openOnboardingModal = function() {
     const modal = document.getElementById('onboarding-modal');
     if (modal) modal.style.display = 'flex';
@@ -1123,7 +1215,6 @@ window.openOnboardingModal = function() {
     if (document.getElementById('onb-user-name')) document.getElementById('onb-user-name').value = p.name || '';
     if (document.getElementById('onb-goal')) document.getElementById('onb-goal').value = p.targetGoal || '';
     if (document.getElementById('onb-surgery-focus')) document.getElementById('onb-surgery-focus').value = p.surgeryFocus || '';
-    if (document.getElementById('onb-profile-type')) document.getElementById('onb-profile-type').value = p.profileType || 'engineering';
 };
 
 window.closeOnboardingModal = function() {
@@ -1131,89 +1222,47 @@ window.closeOnboardingModal = function() {
     if (modal) modal.style.display = 'none';
 };
 
-window.clearIndexedPDI = function() {
-    if (confirm("Deseja restaurar as configurações padrão?")) {
-        MentoriiCore.resetToDefault();
-        renderDashboard();
-        closeOnboardingModal();
-    }
-};
-
 window.submitOnboardingForm = function() {
     const nameVal = (document.getElementById('onb-user-name') || {}).value || "Estudante";
-    const goalVal = (document.getElementById('onb-goal') || {}).value || "Meta de Estudos";
-    const surgeryVal = (document.getElementById('onb-surgery-focus') || {}).value || "Prática Solo";
-    const profileTypeVal = (document.getElementById('onb-profile-type') || {}).value || "engineering";
-    const subjectsVal = (document.getElementById('onb-subjects') || {}).value || "";
+    const goalVal = (document.getElementById('onb-goal') || {}).value || "";
+    const surgeryVal = (document.getElementById('onb-surgery-focus') || {}).value || "";
 
     MentoriiCore.state.profile.name = nameVal.trim();
     MentoriiCore.state.profile.targetGoal = goalVal.trim();
     MentoriiCore.state.profile.surgeryFocus = surgeryVal.trim();
-    MentoriiCore.state.profile.profileType = profileTypeVal;
-
-    if (subjectsVal.trim().length > 0) {
-        const list = subjectsVal.split(/[,\\n]/).map(s => s.trim()).filter(s => s.length > 0);
-        if (list.length > 0) {
-            MentoriiCore.state.activeCourses = list.slice(0, 6).map((item, index) => ({
-                id: `c_${index}_${Date.now()}`,
-                name: item,
-                label: "Frente Prioritária",
-                completed: false,
-                items: [
-                    { id: `i_${index}_1`, name: "Módulo 1: Conceitos e Fundamentos", done: false },
-                    { id: `i_${index}_2`, name: "Módulo 2: Prática e Resolução Solo", done: false },
-                    { id: `i_${index}_3`, name: "Módulo 3: Exercícios de Fixação", done: false }
-                ]
-            }));
-        }
-    }
 
     MentoriiCore.save();
+    renderUserSelector();
     closeOnboardingModal();
     renderDashboard();
+    renderAllTabs();
     alert("🎉 Configurações salvas com sucesso!");
 };
 
-function setupEventListeners() {
-    const fileBtn = document.getElementById('btn-trigger-file-input');
-    const fileInput = document.getElementById('pdi-file-input-element');
-    const pasteToggleBtn = document.getElementById('btn-trigger-paste-box');
-    const applyPastedBtn = document.getElementById('btn-apply-pasted-pdi');
-
-    if (fileBtn && fileInput) fileBtn.onclick = () => fileInput.click();
-
-    if (fileInput) {
-        fileInput.onchange = function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (evt) {
-                processPDIContent(evt.target.result, file.name);
-                fileInput.value = "";
-            };
-            reader.readAsText(file);
-        };
+// PROCESSADORES DE IMPORTAÇÃO (ARQUIVO E TEXTO)
+window.handleApplyPastedPDI = function() {
+    const textarea = document.getElementById('paste-pdi-json-input');
+    const text = textarea ? textarea.value : "";
+    
+    if (!text.trim()) {
+        alert("⚠️ Cole o conteúdo JSON ou texto do PDI na caixa antes de aplicar.");
+        return;
     }
+    
+    processPDIContent(text, "Texto/JSON Colado");
+};
 
-    if (pasteToggleBtn) {
-        pasteToggleBtn.onclick = function () {
-            const container = document.getElementById('paste-pdi-container');
-            if (container) container.style.display = (container.style.display === 'none' || container.style.display === '') ? 'block' : 'none';
-        };
-    }
+window.handleFileSelected = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    if (applyPastedBtn) {
-        applyPastedBtn.onclick = function () {
-            const text = (document.getElementById('paste-pdi-json-input') || {}).value || "";
-            if (!text.trim()) {
-                alert("⚠️ Cole o conteúdo antes de aplicar.");
-                return;
-            }
-            processPDIContent(text, "Texto/JSON Colado");
-        };
-    }
-}
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        processPDIContent(evt.target.result, file.name);
+        event.target.value = "";
+    };
+    reader.readAsText(file);
+};
 
 function processPDIContent(rawContent, sourceName) {
     try {
@@ -1222,25 +1271,32 @@ function processPDIContent(rawContent, sourceName) {
             return;
         }
 
-        const selectedProfile = (document.getElementById('onb-profile-type') || {}).value || MentoriiCore.state.profile.profileType || "engineering";
-        const parsed = MentoriiOracle.parsePDIStructure(rawContent, selectedProfile);
+        const parsed = MentoriiOracle.parsePDIStructure(rawContent, MentoriiCore.state.profile?.profileType || "engineering");
 
         if (parsed && (parsed.activeCourses.length > 0 || parsed.incubatedCourses.length > 0)) {
             if (parsed.profile.targetGoal) MentoriiCore.state.profile.targetGoal = parsed.profile.targetGoal;
             if (parsed.profile.surgeryFocus) MentoriiCore.state.profile.surgeryFocus = parsed.profile.surgeryFocus;
-            MentoriiCore.state.profile.profileType = selectedProfile;
             
             MentoriiCore.state.activeCourses = parsed.activeCourses;
             MentoriiCore.state.incubatedCourses = parsed.incubatedCourses;
 
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            MentoriiCore.state.profile.indexedFileName = `${sourceName} (Indexado às ${timeStr})`;
+            MentoriiCore.state.profile.indexedFileName = `${sourceName} (${timeStr})`;
 
             MentoriiCore.save();
-            closeOnboardingModal();
             renderDashboard();
+            renderAllTabs();
+
+            const statusBox = document.getElementById('pdi-file-status-box');
+            const label = document.getElementById('pdi-filename-label');
+            if (statusBox && label) {
+                statusBox.style.display = 'flex';
+                label.textContent = `${sourceName} (${parsed.activeCourses.length} frentes ativas)`;
+            }
 
             alert(`🎉 Conteúdo Processado com Sucesso!\n\nFonte: ${sourceName}\n${parsed.activeCourses.length} disciplina(s) na Grade Ativa\n${parsed.incubatedCourses.length} curso(s) na Incubadora.`);
+            
+            switchTab('tab-foco', document.querySelector('.tab-btn[onclick*="tab-foco"]'));
         } else {
             alert("❌ Nenhuma disciplina válida encontrada no conteúdo fornecido.");
         }
@@ -1250,13 +1306,40 @@ function processPDIContent(rawContent, sourceName) {
     }
 }
 
-// GRÁFICOS
+window.clearIndexedPDI = function() {
+    if (confirm("Deseja limpar os dados importados e reiniciar as disciplinas ativas?")) {
+        MentoriiCore.state.activeCourses = [];
+        MentoriiCore.state.incubatedCourses = [];
+        MentoriiCore.state.profile.indexedFileName = "";
+        MentoriiCore.save();
+        renderDashboard();
+        renderAllTabs();
+        
+        const statusBox = document.getElementById('pdi-file-status-box');
+        if (statusBox) statusBox.style.display = 'none';
+        alert("🔄 Dados de PDI limpos com sucesso!");
+    }
+};
+
+let weeklyBarChartInstance = null;
+let distributionDoughnutInstance = null;
+
 function initCharts() {
     const barCtx = document.getElementById('weeklyBarChart')?.getContext('2d');
     const donutCtx = document.getElementById('distributionDoughnutChart')?.getContext('2d');
 
+    if (weeklyBarChartInstance) {
+        weeklyBarChartInstance.destroy();
+        weeklyBarChartInstance = null;
+    }
+
+    if (distributionDoughnutInstance) {
+        distributionDoughnutInstance.destroy();
+        distributionDoughnutInstance = null;
+    }
+
     if (barCtx) {
-        new Chart(barCtx, {
+        weeklyBarChartInstance = new Chart(barCtx, {
             type: 'bar',
             data: {
                 labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
@@ -1267,10 +1350,10 @@ function initCharts() {
     }
 
     if (donutCtx) {
-        new Chart(donutCtx, {
+        distributionDoughnutInstance = new Chart(donutCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Foco Principal (IC/Visão)', 'Backend / C#', 'Lógica Pura', 'Infra / Suporte'],
+                labels: ['Foco Principal', 'Prática Solo', 'Revisões', 'Suporte'],
                 datasets: [{ data: [40, 30, 20, 10], backgroundColor: ['#9d7bb0', '#e287a8', '#82b39a', '#e6a15c'] }]
             },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
@@ -1278,12 +1361,11 @@ function initCharts() {
     }
 }
 
-// BACKUP & RESET
 window.exportBackupJSON = function() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(MentoriiCore.state, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `mentorii_backup_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute("download", `pdi_mentorii_${(MentoriiCore.state.profile?.name || 'estudante').toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -1299,19 +1381,20 @@ window.importBackupJSON = function(event) {
             MentoriiCore.state = JSON.parse(e.target.result);
             MentoriiCore.save();
             renderDashboard();
-            alert("📂 Backup restaurado com sucesso!");
+            renderAllTabs();
+            alert("📂 PDI / Backup importado com sucesso!");
         } catch (err) {
-            alert("❌ JSON de backup inválido.");
+            alert("❌ Arquivo JSON de PDI inválido.");
         }
     };
     reader.readAsText(file);
 };
 
 window.resetAllAppData = function() {
-    if (confirm("Atenção: Isso restaurará todos os dados para o padrão limpo da V15. Continuar?")) {
-        localStorage.removeItem('mentorii_app_state_v16');
-        MentoriiCore.resetToDefault();
+    if (confirm("Atenção: Isso reinicializará o perfil ativo para o estado 100% limpo e vazio. Deseja continuar?")) {
+        MentoriiCore.resetCurrentUserData();
         renderDashboard();
-        alert("🔄 Sistema restaurado com sucesso para o estado original!");
+        renderAllTabs();
+        alert("🔄 Perfil reinicializado com sucesso!");
     }
 };
